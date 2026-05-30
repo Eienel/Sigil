@@ -240,6 +240,30 @@ filled wax seal, agent as an engraved outline seal, same accent.
   0x22c8605b13fc52488b494b0a65b526d8bce2101dfba52f23d3b4d735089188a5, read the
   object AND the AttestationCreated event back through Tatum, all fields match.
 
+### Phase 4 - Human sign flow (DONE, awaiting one live wallet click)
+- ARCHITECTURE: wallet only signs; all RPC stays on Tatum. Two routes:
+  - POST /api/store-and-prepare: takes file + sender + provenanceType + label,
+    stores the file on Walrus, computes sha256 server side (bound to the exact
+    bytes), builds a fully resolved create tx (gas price + gas coins read via
+    Tatum in lib/server-sui.ts), returns { blobId, sha256, txBytes(base64) }.
+  - POST /api/submit: takes { txBytes, signature } from the wallet, submits
+    through Tatum via executeAndWait, returns { digest, objectId }.
+- UI: components/sign-flow.tsx (client). ConnectButton gate, drag-drop dropzone,
+  3 way provenance selector with sliding layoutId indicator, optional label,
+  seal-press flow, then a certificate view (wax seal press animation, file,
+  sha256, blob, Sigil ID, tx digest, links to /verify and suiscan). Uses
+  useSignTransaction + useCurrentAccount from dapp-kit.
+- VERIFIED SERVER PATH END TO END: prepared a real file (stored on Walrus blob
+  xEigi5zMrOOj59HL8upysFsHhrOWFRO3ImjfmZRJ1Pc), signed the exact returned bytes
+  with the deployer key to simulate the wallet, posted to /api/submit -> HTTP
+  200, tx 8Jk2T3WtNRtHYutt4hfVPwYsXhzuZAbSongERk76kmvP, attestation object
+  0xbf93ae06bf73be3722ab50ac93a4a89b1662b82c791838142897070b4178874f. The wallet
+  signs identical bytes, so the only unproven step is the browser popup itself.
+- npm run build passes, /api/store-and-prepare + /api/submit registered.
+- TODO for user: connect a browser wallet (Slush/Sui Wallet) on testnet at /app
+  and approve one signature to confirm the popup + certificate render live.
+
 ### Pending blockers / asks
+- (Phase 4) User to do one live wallet sign at /app on testnet (popup only).
 - (Phase 6) Generate the SEPARATE dedicated agent keypair.
 - (Phase 8) Mainnet wallet funded with SUI and WAL.
