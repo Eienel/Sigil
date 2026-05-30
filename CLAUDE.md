@@ -192,16 +192,25 @@ filled wax seal, agent as an engraved outline seal, same accent.
 - lib/walrus.ts: storeBlob (both branches), readBlob/readBlobText, 10 MiB cap
   with clear error, typed errors.
 - Check PASSED: scripts/walrus-test.ts stored a blob and read it back, content
-  + sha256 matched. (blobId _ginp4Fv44Bttq42tpyN0Ai2Qo7Fxs9TY3Gi9Mg6du0)
+  + sha256 matched. (last blobId _QJKrmEn91ak9KbI2pJasx5YzGRjaowulk1v_q2BLJ4)
 
 ### Phase 2 - Tatum Sui RPC client (DONE)
 - Confirmed from docs/search: x-api-key header, standard Sui JSON-RPC over
   sui-{testnet,mainnet}.gateway.tatum.io.
 - lib/tatum.ts: suiRpc single chokepoint + typed helpers (getBalance,
-  getLatestSuiSystemState, getReferenceGasPrice, getObject, getCoins,
-  queryEvents). lib/load-env.ts loads .env.local for standalone scripts.
-- Check PASSED: scripts/tatum-test.ts read epoch 843, protocol v90, gas 1000,
-  deployer balance 1 SUI, all through Tatum.
+  getChainIdentifier, getLatestSuiSystemState, getReferenceGasPrice, getObject,
+  getCoins, queryEvents). lib/load-env.ts loads .env.local for standalone
+  scripts.
+- NOTE: Tatum's pool does not serve suix_getLatestSuiSystemState (returns
+  "Method not found"). The Phase 2 check relies on sui_getChainIdentifier +
+  suix_getReferenceGasPrice + suix_getBalance and treats system state as best
+  effort / skipped.
+- RATE LIMIT: the Tatum free plan caps at ~3 requests/second (429 otherwise).
+  suiRpc now serializes calls through a promise gate spaced by
+  TATUM_MIN_INTERVAL_MS (default 350ms) and retries 429 with backoff. This is
+  essential for the multi call publish/create/verify flows.
+- Check PASSED: scripts/tatum-test.ts read chain id 4c78adac, reference gas
+  price 1000, deployer balance 1 SUI, all through Tatum.
 
 ### Pending blockers / asks
 - (Phase 3) Need the Sui Move toolchain (sui CLI) to compile/publish, or an
