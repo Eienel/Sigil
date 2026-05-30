@@ -279,7 +279,7 @@ filled wax seal, agent as an engraved outline seal, same accent.
   authentic (recovered the blob from Walrus, sha256 matched, hashMatch true),
   tampered (random file -> hashMatch false), not_found (unknown id).
 
-### Phase 6 - Agent flow (DONE, awaiting agent address funding)
+### Phase 6 - Agent flow (DONE, live verified)
 - Generated the SEPARATE dedicated agent keypair (distinct from the deployer)
   plus a demo agent API key. Both server only in .env.local (AGENT_PRIVATE_KEY,
   AGENT_API_KEY). Agent testnet address:
@@ -292,10 +292,12 @@ filled wax seal, agent as an engraved outline seal, same accent.
 - lib/agent-auth.ts: maps API key -> agent keypair with constant time compare.
 - UI: /agents page now renders components/agent-docs.tsx (copyable curl + JS
   snippets, endpoint docs, provenance table).
-- Check PARTIAL: auth rejection verified (no key -> 401 Missing, wrong key ->
-  401 Invalid). Valid key path stores on Walrus + builds tx + reaches signing,
-  then stops at "agent address has no SUI to pay gas" because the agent address
-  is not yet funded. Full success requires funding the address above.
+- Check PASSED (live): agent address funded with 0.5 testnet SUI (confirmed
+  via Tatum). POST /api/sign with the agent key returned HTTP 200; the created
+  object was read back directly through Tatum and confirmed type
+  sigil::Attestation, signer == agent address, provenance 1, blob id matching
+  the response. Auth rejections also verified (no key -> 401 Missing, wrong key
+  -> 401 Invalid).
 
 ### Phase 7 - MCP wrapper (DONE)
 - mcp/sigil-mcp.ts: an MCP server (stdio) exposing two tools, sigil_sign and
@@ -304,12 +306,19 @@ filled wax seal, agent as an engraved outline seal, same accent.
   one place and the MCP path reuses the agent API key.
 - Config: SIGIL_BASE_URL (default http://localhost:3000), SIGIL_AGENT_KEY
   (falls back to AGENT_API_KEY). Run with: npm run mcp.
-- Check PASSED (startup): server boots over stdio and logs "Sigil MCP server
-  ready" to stderr (stdout reserved for the MCP channel). Full tool round trip
-  pends the agent address funding, same blocker as Phase 6.
+- Check PASSED (live): a real MCP client connected over stdio, listed both
+  tools, called sigil_verify on the agent's attestation (verdict authentic,
+  signer == agent), and called sigil_sign to create a second attestation. Tatum
+  event query confirmed exactly 2 AttestationCreated events from the agent (one
+  via /api/sign, one via the MCP sigil_sign tool).
+
+### SESSION NOTE (output integrity)
+- During the Phase 6/7 live checks, terminal/Read output intermittently
+  duplicated or truncated lines. All critical results were therefore confirmed
+  by tamper-evident means: direct Tatum on-chain reads, process exit codes, and
+  remote git ref updates, not by trusting raw stdout. On-chain state is the
+  source of truth and it checks out.
 
 ### Pending blockers / asks
 - (Phase 4) User to do one live wallet sign at /app on testnet (popup only).
-- (Phase 6) Fund the agent address 0x9a8215f6...b405d with testnet SUI so
-  /api/sign can complete a real attestation.
 - (Phase 8) Mainnet wallet funded with SUI and WAL.
