@@ -329,7 +329,17 @@ filled wax seal, agent as an engraved outline seal, same accent.
   provenance model + the "notary not copyright" framing, all flows, env vars,
   scripts, and deploy steps.
 - Screenshots captured via Playwright (11 shots, light + dark) and sent to user.
-- TODO: Vercel deploy (env vars), then final mainnet switch + smoke test.
+- DEPLOYED to Vercel (production) via CLI. Live URL: https://sigil-five-chi.vercel.app
+  (deployment alias sigil-qb4wbg22m-...vercel.app). All 11 env vars set in the
+  Vercel production env (secrets server-only, NEXT_PUBLIC_* exposed). Project
+  elnasirulabaran-9050s-projects/sigil. Still SUI_NETWORK=testnet.
+- LIVE SMOKE TEST PASSED on the deployed site: all 5 pages 200; /api/registry
+  returns the real testnet attestations through Tatum; /api/verify by Sigil ID
+  returns authentic with Walrus blobAvailable true; /api/sign created a NEW
+  attestation end to end on production (blob jRMeb5Ys..., object 0x5187a3a6...,
+  signer == agent), now visible in the live registry as "prod smoke test".
+- PR #1 (claude/sigil-provenance-layer-ocAFE -> main) updated to cover Phases 0-8.
+- TODO: final mainnet switch + smoke test (needs mainnet wallet funded w/ SUI+WAL).
 
 ### SESSION NOTE (output integrity)
 - During the Phase 6/7 live checks, terminal/Read output intermittently
