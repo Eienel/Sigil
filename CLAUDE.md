@@ -297,6 +297,17 @@ filled wax seal, agent as an engraved outline seal, same accent.
   then stops at "agent address has no SUI to pay gas" because the agent address
   is not yet funded. Full success requires funding the address above.
 
+### Phase 7 - MCP wrapper (DONE)
+- mcp/sigil-mcp.ts: an MCP server (stdio) exposing two tools, sigil_sign and
+  sigil_verify, built on @modelcontextprotocol/sdk 1.21 + zod. It is a thin
+  client over /api/sign and /api/verify, so all Walrus + Tatum logic stays in
+  one place and the MCP path reuses the agent API key.
+- Config: SIGIL_BASE_URL (default http://localhost:3000), SIGIL_AGENT_KEY
+  (falls back to AGENT_API_KEY). Run with: npm run mcp.
+- Check PASSED (startup): server boots over stdio and logs "Sigil MCP server
+  ready" to stderr (stdout reserved for the MCP channel). Full tool round trip
+  pends the agent address funding, same blocker as Phase 6.
+
 ### Pending blockers / asks
 - (Phase 4) User to do one live wallet sign at /app on testnet (popup only).
 - (Phase 6) Fund the agent address 0x9a8215f6...b405d with testnet SUI so
