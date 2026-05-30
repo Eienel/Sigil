@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+  Sigil design system. Aesthetic: ink, paper, wax seal.
+  Animate transform and opacity only. Spring motion lives in JS (Motion).
+*/
+
+@theme {
+  /* Light: paper and ink */
+  --color-ink: #15120e;
+  --color-paper: #f6f2ea;
+  --color-surface: #fcfaf4;
+  --color-hairline: #e4ddcf;
+  --color-muted: #6a6358;
+  --color-wax: #7c2d2d; /* single accent, sealing wax */
+  --color-verified: #2e6049; /* verified only green */
+
+  /* Dark mode tokens (applied via .dark below) */
+  --color-ink-dark: #f1ece1;
+  --color-paper-dark: #0e0c09;
+  --color-wax-dark: #a23a3a;
+
+  /* Fonts. San Francisco system first, Geist fallback, Geist Mono for hashes */
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "SF Pro Text", "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  /* Spring-friendly easing is done in JS; keep CSS transitions short */
+  --ease-seal: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root {
+  --bg: var(--color-paper);
+  --fg: var(--color-ink);
+  --surface: var(--color-surface);
+  --hairline: var(--color-hairline);
+  --muted: var(--color-muted);
+  --accent: var(--color-wax);
+  --verified: var(--color-verified);
+  color-scheme: light;
+}
+
+.dark {
+  /*
+    Override the actual --color-* theme tokens so the Tailwind generated
+    utilities (text-ink, bg-surface, border-hairline, ...) flip in dark mode,
+    not just the aliases below.
+  */
+  --color-ink: #f1ece1;
+  --color-paper: #0e0c09;
+  --color-surface: #15120e;
+  --color-hairline: #2a251d;
+  --color-muted: #9b9384;
+  --color-wax: #a23a3a;
+  --color-verified: #4f9a78;
+
+  /* Aliases used by inline var() styles */
+  --bg: #0e0c09;
+  --fg: #f1ece1;
+  --surface: #15120e;
+  --hairline: #2a251d;
+  --muted: #9b9384;
+  --accent: #a23a3a;
+  --verified: #4f9a78;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    /* Faint paper texture is the only allowed gradient */
+    background-image: radial-gradient(
+      circle at 50% 0%,
+      color-mix(in srgb, var(--fg) 2%, transparent),
+      transparent 60%
+    );
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  /* One stroke width globally for Phosphor icons set via prop; keep crisp */
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+/* Honor reduced motion: kill non-essential animation and transition */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Reduced transparency fallback */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background-color: var(--surface) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Utility tokens mapped to CSS vars so Tailwind arbitrary values can use them */
+@utility text-muted {
+  color: var(--muted);
+}
+@utility border-hairline {
+  border-color: var(--hairline);
+}
+@utility bg-surface {
+  background-color: var(--surface);
+}
+@utility bg-paper {
+  background-color: var(--bg);
+}
+@utility text-ink {
+  color: var(--fg);
+}
+@utility text-wax {
+  color: var(--accent);
+}
+@utility bg-wax {
+  background-color: var(--accent);
+}
+@utility text-verified {
+  color: var(--verified);
+}
