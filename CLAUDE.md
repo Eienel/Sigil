@@ -279,7 +279,26 @@ filled wax seal, agent as an engraved outline seal, same accent.
   authentic (recovered the blob from Walrus, sha256 matched, hashMatch true),
   tampered (random file -> hashMatch false), not_found (unknown id).
 
+### Phase 6 - Agent flow (DONE, awaiting agent address funding)
+- Generated the SEPARATE dedicated agent keypair (distinct from the deployer)
+  plus a demo agent API key. Both server only in .env.local (AGENT_PRIVATE_KEY,
+  AGENT_API_KEY). Agent testnet address:
+  0x9a8215f6d644e72c4b9227ab1f33960943c31b64cb1a40885e2b6bb9c0eb405d
+- POST /api/sign: auth via x-api-key or Authorization: Bearer. Accepts JSON
+  { content } or { sha256, blobId }, or multipart file. Stores on Walrus,
+  computes sha256 server side, signs with the agent keypair, submits via Tatum
+  (lib/agent-sign.ts). Returns blobId, sha256, digest, objectId, signer,
+  verifyUrl. Default provenanceType 1 (AI generated) for agents.
+- lib/agent-auth.ts: maps API key -> agent keypair with constant time compare.
+- UI: /agents page now renders components/agent-docs.tsx (copyable curl + JS
+  snippets, endpoint docs, provenance table).
+- Check PARTIAL: auth rejection verified (no key -> 401 Missing, wrong key ->
+  401 Invalid). Valid key path stores on Walrus + builds tx + reaches signing,
+  then stops at "agent address has no SUI to pay gas" because the agent address
+  is not yet funded. Full success requires funding the address above.
+
 ### Pending blockers / asks
 - (Phase 4) User to do one live wallet sign at /app on testnet (popup only).
-- (Phase 6) Generate the SEPARATE dedicated agent keypair.
+- (Phase 6) Fund the agent address 0x9a8215f6...b405d with testnet SUI so
+  /api/sign can complete a real attestation.
 - (Phase 8) Mainnet wallet funded with SUI and WAL.
