@@ -263,6 +263,22 @@ filled wax seal, agent as an engraved outline seal, same accent.
 - TODO for user: connect a browser wallet (Slush/Sui Wallet) on testnet at /app
   and approve one signature to confirm the popup + certificate render live.
 
+### Phase 5 - Verify flow (DONE)
+- POST /api/verify accepts a Sigil ID and/or a file. Resolves the attestation
+  by object id (sui_getObject) or, file-only, by content hash via
+  suix_queryEvents over AttestationCreated. All reads through Tatum. Also fetches
+  the Walrus blob to confirm retrievability (blobAvailable). Primary tamper check
+  is recomputed sha256 vs on-chain sha256. Verdicts: authentic / tampered /
+  not_found.
+- UI: components/verify-flow.tsx (client) with file dropzone + Sigil ID input,
+  loading skeleton, SVG check line-draw on authentic, signer/time/provenance/
+  blob/sha256/Sigil ID rows, suiscan link. /verify?id=0x... deep link from the
+  certificate auto-runs the lookup (wrapped in Suspense for useSearchParams).
+- Check PASSED, all three verdicts self-verified against the real Phase 4
+  attestation 0xbf93ae06...874f (blob xEigi5z..., sha256 fddd6cc4...968c):
+  authentic (recovered the blob from Walrus, sha256 matched, hashMatch true),
+  tampered (random file -> hashMatch false), not_found (unknown id).
+
 ### Pending blockers / asks
 - (Phase 4) User to do one live wallet sign at /app on testnet (popup only).
 - (Phase 6) Generate the SEPARATE dedicated agent keypair.
