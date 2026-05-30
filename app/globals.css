@@ -41,12 +41,26 @@
 }
 
 .dark {
-  --bg: var(--color-paper-dark);
-  --fg: var(--color-ink-dark);
+  /*
+    Override the actual --color-* theme tokens so the Tailwind generated
+    utilities (text-ink, bg-surface, border-hairline, ...) flip in dark mode,
+    not just the aliases below.
+  */
+  --color-ink: #f1ece1;
+  --color-paper: #0e0c09;
+  --color-surface: #15120e;
+  --color-hairline: #2a251d;
+  --color-muted: #9b9384;
+  --color-wax: #a23a3a;
+  --color-verified: #4f9a78;
+
+  /* Aliases used by inline var() styles */
+  --bg: #0e0c09;
+  --fg: #f1ece1;
   --surface: #15120e;
   --hairline: #2a251d;
   --muted: #9b9384;
-  --accent: var(--color-wax-dark);
+  --accent: #a23a3a;
   --verified: #4f9a78;
   color-scheme: dark;
 }

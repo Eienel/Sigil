@@ -312,6 +312,25 @@ filled wax seal, agent as an engraved outline seal, same accent.
   event query confirmed exactly 2 AttestationCreated events from the agent (one
   via /api/sign, one via the MCP sigil_sign tool).
 
+### Phase 8 - Polish, dark mode, registry, README, deploy (IN PROGRESS)
+- Registry: app/api/registry/route.ts reads AttestationCreated events via Tatum
+  (queryEvents), components/registry-feed.tsx renders the live feed with
+  skeletons, empty state, filled seal for human / engraved for agent. Verified
+  live: returns the 5 real testnet attestations newest first.
+- Dark mode: components/theme-toggle.tsx (persists to localStorage, respects
+  system), anti-FOUC inline script in app/layout.tsx head. FIXED a token bug:
+  the .dark block now overrides the actual --color-* theme tokens (not just the
+  --bg/--fg aliases), so Tailwind v4 generated utilities (text-ink, bg-surface)
+  flip correctly. Re-verified hero headline is legible in dark.
+- Proximity polish: components/proximity.tsx, pointer-distance scale+lift on nav
+  links using Motion springs (transform/opacity only, disabled under reduced
+  motion). Wired into site-nav.
+- README.md written: covers exactly how Walrus and Tatum are used, the
+  provenance model + the "notary not copyright" framing, all flows, env vars,
+  scripts, and deploy steps.
+- Screenshots captured via Playwright (11 shots, light + dark) and sent to user.
+- TODO: Vercel deploy (env vars), then final mainnet switch + smoke test.
+
 ### SESSION NOTE (output integrity)
 - During the Phase 6/7 live checks, terminal/Read output intermittently
   duplicated or truncated lines. All critical results were therefore confirmed

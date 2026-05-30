@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { WaxSeal } from "./wax-seal";
+import { ThemeToggle } from "./theme-toggle";
+import { Proximity } from "./proximity";
 
 const LINKS = [
   { href: "/app", label: "Sign" },
@@ -25,25 +27,27 @@ export function SiteNav() {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-1 sm:flex">
+        <Proximity className="hidden items-center gap-1 sm:flex">
           {LINKS.map((l) => (
-            <li key={l.href}>
-              <NavLink
-                href={l.href}
-                label={l.label}
-                active={pathname === l.href}
-              />
-            </li>
+            <NavLink
+              key={l.href}
+              href={l.href}
+              label={l.label}
+              active={pathname === l.href}
+            />
           ))}
-        </ul>
+        </Proximity>
 
-        <Link
-          href="/app"
-          className="rounded-full bg-wax px-4 py-2 text-sm font-medium text-paper transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          style={{ color: "var(--bg)" }}
-        >
-          Open app
-        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link
+            href="/app"
+            className="rounded-full bg-wax px-4 py-2 text-sm font-medium transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            style={{ color: "var(--bg)" }}
+          >
+            Open app
+          </Link>
+        </div>
       </nav>
     </header>
   );

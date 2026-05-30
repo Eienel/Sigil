@@ -33,3 +33,5 @@ yarn-error.log*
 
 # local notes
 /.vercel
+/shots
+/test-results
