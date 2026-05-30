@@ -1,0 +1,10 @@
+[package]
+name = "sigil"
+edition = "2024.beta"
+
+# The Sui framework is an implicit system dependency in this toolchain, so no
+# explicit git dependency is needed. Keeps builds fast and offline friendly.
+[dependencies]
+
+[addresses]
+sigil = "0x0"

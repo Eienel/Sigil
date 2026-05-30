@@ -9,6 +9,7 @@
     "lint": "next lint",
     "walrus:test": "tsx scripts/walrus-test.ts",
     "tatum:test": "tsx scripts/tatum-test.ts",
+    "sigil:publish": "tsx scripts/publish.ts",
     "sigil:create": "tsx scripts/create-attestation.ts"
   },
   "dependencies": {

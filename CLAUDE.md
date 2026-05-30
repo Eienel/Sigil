@@ -212,8 +212,34 @@ filled wax seal, agent as an engraved outline seal, same accent.
 - Check PASSED: scripts/tatum-test.ts read chain id 4c78adac, reference gas
   price 1000, deployer balance 1 SUI, all through Tatum.
 
+### Phase 3 - Move module published to testnet (DONE)
+- Installed sui CLI 1.58.2 (prebuilt linux binary, /usr/local/bin/sui). The Sui
+  framework is an implicit system dependency in this toolchain, so Move.toml has
+  an empty [dependencies] block.
+- move/sigil/sources/sigil.move: Attestation { signer, walrus_blob_id,
+  sha256_hex, provenance_type u8, timestamp_ms, label } + create() (validates
+  provenance 0/1/2, uses 0x6 Clock for timestamp, emits AttestationCreated,
+  transfers object to signer) + read accessors. public fun (not entry) so PTBs
+  can call it; self_transfer lint allowed intentionally.
+- BUILD/PUBLISH PATH: `sui move build --dump-bytecode-as-base64` insists on its
+  own network connection (to fetch chain id) and cannot send Tatum's x-api-key
+  header. So scripts/build-package.ts compiles locally with `sui move build`,
+  then reads build/sigil/bytecode_modules/sigil.mv as base64 and uses the four
+  implicit framework dep ids (0x1,0x2,0x3,0xb). The publish TX is built with
+  @mysten/sui and submitted through Tatum via executeAndWait. Build stays local,
+  every on chain write stays on Tatum.
+- Published to TESTNET through Tatum. Package id:
+  0x66b4329479630cbdf74303cb5da63ad6bc185e20869ae9bdccd6bb5b63a666a2
+  (publish tx 3EXuDzFZ5YC4KmWixPCAqe6GbrdLwuWXYeKJqhYnNHXL). Saved to .env.local
+  as SIGIL_PACKAGE_ID + NEXT_PUBLIC_SIGIL_PACKAGE_ID.
+- lib/sigil.ts: buildCreateTransaction (refs 0x6 as sharedObjectRef so it builds
+  offline), parseAttestationContent, event/struct type helpers, PROVENANCE enum.
+- Check PASSED: scripts/create-attestation.ts stored content on Walrus
+  (blob B-ctfxBNUjphntI-EGDkSHS5degFKtoHP87WYHt42G0), called create through Tatum
+  (tx 66qKDGukS6CnWsjvXn9sPrJi5G8uWfd7JwAkYDDbixmn, success), object
+  0x22c8605b13fc52488b494b0a65b526d8bce2101dfba52f23d3b4d735089188a5, read the
+  object AND the AttestationCreated event back through Tatum, all fields match.
+
 ### Pending blockers / asks
-- (Phase 3) Need the Sui Move toolchain (sui CLI) to compile/publish, or an
-  alternative publish path. Will assess at Phase 3 start.
 - (Phase 6) Generate the SEPARATE dedicated agent keypair.
 - (Phase 8) Mainnet wallet funded with SUI and WAL.
