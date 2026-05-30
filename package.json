@@ -10,9 +10,11 @@
     "walrus:test": "tsx scripts/walrus-test.ts",
     "tatum:test": "tsx scripts/tatum-test.ts",
     "sigil:publish": "tsx scripts/publish.ts",
-    "sigil:create": "tsx scripts/create-attestation.ts"
+    "sigil:create": "tsx scripts/create-attestation.ts",
+    "mcp": "tsx mcp/sigil-mcp.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@mysten/dapp-kit": "^0.18.0",
     "@mysten/sui": "^1.40.0",
     "@noble/hashes": "^1.8.0",
@@ -22,7 +24,8 @@
     "motion": "^12.23.0",
     "next": "^15.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
