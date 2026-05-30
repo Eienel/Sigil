@@ -33,19 +33,26 @@ export default function HomePage() {
 
           <Reveal delay={0.15}>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <ButtonLink href="/app" size="lg" className="w-full sm:w-auto">
+              <ButtonLink
+                href="/app"
+                size="lg"
+                className="w-full sm:w-auto"
+                hoverLabel={
+                  <>
+                    Press your seal
+                    <ArrowRight size={16} weight="regular" />
+                  </>
+                }
+              >
                 Sign something
-                <ArrowRight
-                  size={16}
-                  weight="regular"
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                />
+                <ArrowRight size={16} weight="regular" />
               </ButtonLink>
               <ButtonLink
                 href="/verify"
                 variant="secondary"
                 size="lg"
                 className="w-full sm:w-auto"
+                hoverLabel="Check authenticity"
               >
                 Verify a file
               </ButtonLink>

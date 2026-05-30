@@ -4,25 +4,26 @@ import Link from "next/link";
 import { forwardRef } from "react";
 
 /*
-  Sigil button. The hover effect is a wax fill that wipes up from the bottom,
-  plus a small lift, so the control feels alive rather than binary. The fill is
-  a layer scaled on the Y axis (transform only), under the label. Honors the
-  design system: transform and opacity only, spring-like easing in CSS.
+  Sigil button, Slush-style hover.
 
-  Variants:
-    primary    solid wax, fill darkens on hover
-    secondary  hairline outline on surface, wax fills in on hover, label flips
-    ghost      text only, paper fills in on hover
+  On hover two things happen together:
+    1. A solid fill grows from the center of the pill (a layer scaled from 0 to
+       1 about its center), so the button fills in rather than wiping.
+    2. The label swaps with a vertical slide: the resting label slides up and
+       out while the hover label slides in from below. If no hoverLabel is
+       given, the same label is reused so only the fill plays.
+
+  Transform and opacity only, per the design system. Spring-like easing in CSS.
 */
 
 type Variant = "primary" | "secondary" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const SIZES: Record<Size, string> = {
-  // min touch target 44px tall for md/lg, comfortable on mobile
-  sm: "h-9 px-3.5 text-sm gap-1.5",
-  md: "h-11 px-5 text-sm gap-2",
-  lg: "h-12 px-6 text-base gap-2",
+  // min touch target ~44px tall for md/lg, comfortable on mobile
+  sm: "h-9 px-3.5 text-sm",
+  md: "h-11 px-5 text-sm",
+  lg: "h-12 px-6 text-base",
 };
 
 function classesFor(variant: Variant, size: Size, full?: boolean) {
@@ -31,53 +32,68 @@ function classesFor(variant: Variant, size: Size, full?: boolean) {
     "transition-transform duration-200 ease-out will-change-transform " +
     "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] " +
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 " +
+    "focus-visible:ring-wax focus-visible:ring-offset-paper " +
     "disabled:pointer-events-none disabled:opacity-50";
-  const ring = "focus-visible:ring-wax focus-visible:ring-offset-paper";
   const variantCls =
     variant === "primary"
       ? "bg-wax"
       : variant === "secondary"
         ? "border border-hairline bg-surface text-ink"
         : "text-ink";
-  return [base, ring, variantCls, SIZES[size], full ? "w-full" : ""].join(" ");
+  return [base, variantCls, SIZES[size], full ? "w-full" : ""].join(" ");
 }
 
-// The wipe layer + label, shared by button and link.
 function Inner({
   variant,
   children,
+  hoverLabel,
 }: {
   variant: Variant;
   children: React.ReactNode;
+  hoverLabel?: React.ReactNode;
 }) {
-  // Fill color that wipes in on hover.
+  // Fill color that grows in on hover.
   const fill =
     variant === "primary"
       ? "color-mix(in srgb, black 16%, var(--accent))"
       : variant === "secondary"
         ? "var(--accent)"
         : "var(--surface)";
-  // Label color: primary keeps paper text; secondary flips to paper on hover.
-  const labelColor =
-    variant === "primary" ? "var(--bg)" : undefined;
+  // Resting label color (primary keeps paper text on wax).
+  const restColor = variant === "primary" ? "var(--bg)" : undefined;
+  // Hover label color: secondary flips to paper over the wax fill.
+  const hoverColor =
+    variant === "primary"
+      ? "var(--bg)"
+      : variant === "secondary"
+        ? "var(--bg)"
+        : undefined;
+
+  const swap = hoverLabel ?? children;
 
   return (
     <>
+      {/* Fill grows from the center */}
       <span
         aria-hidden
-        className="absolute inset-0 origin-bottom scale-y-0 rounded-full transition-transform duration-300 ease-out group-hover:scale-y-100"
+        className="absolute inset-0 origin-center scale-0 rounded-full transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:scale-100"
         style={{ backgroundColor: fill }}
       />
-      <span
-        className={
-          "relative z-10 inline-flex items-center justify-center gap-2 " +
-          (variant === "secondary"
-            ? "transition-colors duration-200 group-hover:text-paper"
-            : "")
-        }
-        style={{ color: labelColor }}
-      >
-        {children}
+      {/* Label stack: rest label slides up and out, hover label slides in */}
+      <span className="relative z-10 inline-grid">
+        <span
+          className="col-start-1 row-start-1 inline-flex items-center justify-center gap-2 transition-all duration-200 ease-out group-hover:-translate-y-[140%] group-hover:opacity-0"
+          style={{ color: restColor }}
+        >
+          {children}
+        </span>
+        <span
+          aria-hidden
+          className="col-start-1 row-start-1 inline-flex translate-y-[140%] items-center justify-center gap-2 opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100"
+          style={{ color: hoverColor }}
+        >
+          {swap}
+        </span>
       </span>
     </>
   );
@@ -87,11 +103,20 @@ export type ButtonProps = {
   variant?: Variant;
   size?: Size;
   full?: boolean;
+  hoverLabel?: React.ReactNode;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
-    { variant = "primary", size = "md", full, className, children, ...props },
+    {
+      variant = "primary",
+      size = "md",
+      full,
+      hoverLabel,
+      className,
+      children,
+      ...props
+    },
     ref
   ) {
     return (
@@ -100,7 +125,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={`${classesFor(variant, size, full)} ${className ?? ""}`}
         {...props}
       >
-        <Inner variant={variant}>{children}</Inner>
+        <Inner variant={variant} hoverLabel={hoverLabel}>
+          {children}
+        </Inner>
       </button>
     );
   }
@@ -112,6 +139,7 @@ export type ButtonLinkProps = {
   size?: Size;
   full?: boolean;
   external?: boolean;
+  hoverLabel?: React.ReactNode;
 } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">;
 
 export function ButtonLink({
@@ -120,21 +148,27 @@ export function ButtonLink({
   size = "md",
   full,
   external,
+  hoverLabel,
   className,
   children,
   ...props
 }: ButtonLinkProps) {
   const cls = `${classesFor(variant, size, full)} ${className ?? ""}`;
+  const inner = (
+    <Inner variant={variant} hoverLabel={hoverLabel}>
+      {children}
+    </Inner>
+  );
   if (external) {
     return (
       <a href={href} className={cls} {...props}>
-        <Inner variant={variant}>{children}</Inner>
+        {inner}
       </a>
     );
   }
   return (
     <Link href={href} className={cls} {...props}>
-      <Inner variant={variant}>{children}</Inner>
+      {inner}
     </Link>
   );
 }
