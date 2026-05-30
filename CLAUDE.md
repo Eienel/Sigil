@@ -175,7 +175,36 @@ filled wax seal, agent as an engraved outline seal, same accent.
 - BLOCKER to fully close Phase 0: need Tatum API key + funded testnet Sui
   address from user (the stated Phase 0 end gate, also feeds Phase 1/2).
 
+### Phase 0 close-out (DONE)
+- Tatum API key stored in .env.local (testnet + mainnet vars). Auth = x-api-key.
+- Deployer keypair generated locally (user funded it). Decision: user funds,
+  agent gets a SEPARATE dedicated key generated at Phase 6.
+- Deployer testnet address 0xee01a5dce15c4eb0edf08cf428e0957ac8ab4f749b5092837cb7988dac3342de
+  funded with 1 testnet SUI, confirmed via Tatum suix_getBalance.
+- Secrets live only in .env.local (gitignored, mode 600). DEPLOYER_PRIVATE_KEY,
+  TATUM_API_KEY, WALRUS_* set.
+
+### Phase 1 - Walrus client (DONE)
+- Confirmed API from docs.wal.app: PUT /v1/blobs?epochs=<n>, read blobId from
+  newlyCreated.blobObject.blobId OR alreadyCertified.blobId; GET /v1/blobs/<id>.
+- Public testnet endpoints (verified live): publisher.walrus-testnet.walrus.space,
+  aggregator.walrus-testnet.walrus.space.
+- lib/walrus.ts: storeBlob (both branches), readBlob/readBlobText, 10 MiB cap
+  with clear error, typed errors.
+- Check PASSED: scripts/walrus-test.ts stored a blob and read it back, content
+  + sha256 matched. (blobId _ginp4Fv44Bttq42tpyN0Ai2Qo7Fxs9TY3Gi9Mg6du0)
+
+### Phase 2 - Tatum Sui RPC client (DONE)
+- Confirmed from docs/search: x-api-key header, standard Sui JSON-RPC over
+  sui-{testnet,mainnet}.gateway.tatum.io.
+- lib/tatum.ts: suiRpc single chokepoint + typed helpers (getBalance,
+  getLatestSuiSystemState, getReferenceGasPrice, getObject, getCoins,
+  queryEvents). lib/load-env.ts loads .env.local for standalone scripts.
+- Check PASSED: scripts/tatum-test.ts read epoch 843, protocol v90, gas 1000,
+  deployer balance 1 SUI, all through Tatum.
+
 ### Pending blockers / asks
-- (Phase 0 end) Tatum API key + funded testnet Sui address.
-- (Phase 6) How to generate the agent keypair.
+- (Phase 3) Need the Sui Move toolchain (sui CLI) to compile/publish, or an
+  alternative publish path. Will assess at Phase 3 start.
+- (Phase 6) Generate the SEPARATE dedicated agent keypair.
 - (Phase 8) Mainnet wallet funded with SUI and WAL.
