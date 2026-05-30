@@ -159,8 +159,8 @@ function Block({ title, code }: { title: string; code: string }) {
           )}
         </button>
       </div>
-      <pre className="overflow-x-auto px-4 py-3.5">
-        <code className="font-mono text-[13px] leading-relaxed text-ink">
+      <pre className="overflow-x-auto px-4 py-3.5 [-webkit-overflow-scrolling:touch]">
+        <code className="font-mono text-xs leading-relaxed text-ink sm:text-[13px]">
           {code}
         </code>
       </pre>

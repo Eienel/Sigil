@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Feather, Robot, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { InlineDemo } from "@/components/inline-demo";
 import { Reveal } from "@/components/reveal";
+import { ButtonLink } from "@/components/button";
 
 export default function HomePage() {
   return (
@@ -31,25 +32,23 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={0.15}>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/app"
-                className="group flex items-center gap-2 rounded-full bg-wax px-5 py-3 text-sm font-medium transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                style={{ color: "var(--bg)" }}
-              >
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ButtonLink href="/app" size="lg" className="w-full sm:w-auto">
                 Sign something
                 <ArrowRight
                   size={16}
                   weight="regular"
                   className="transition-transform duration-200 group-hover:translate-x-0.5"
                 />
-              </Link>
-              <Link
+              </ButtonLink>
+              <ButtonLink
                 href="/verify"
-                className="rounded-full border border-hairline bg-surface px-5 py-3 text-sm font-medium text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                variant="secondary"
+                size="lg"
+                className="w-full sm:w-auto"
               >
                 Verify a file
-              </Link>
+              </ButtonLink>
             </div>
           </Reveal>
         </div>

@@ -275,8 +275,8 @@ function Row({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-baseline gap-3 px-5 py-3">
-      <dt className="w-32 shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">
+    <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-3 sm:px-5">
+      <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted sm:w-32">
         {label}
       </dt>
       <dd className={`min-w-0 break-all text-sm text-ink ${mono ? "font-mono" : ""}`}>
