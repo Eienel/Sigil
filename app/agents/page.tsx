@@ -1,4 +1,5 @@
 import { AgentDocs } from "@/components/agent-docs";
+import { AgentKeyGen } from "@/components/agent-key-gen";
 
 export const metadata = {
   title: "For agents, Sigil",
@@ -21,6 +22,9 @@ export default function AgentsPage() {
           call.
         </p>
       </header>
+      <div className="mb-8">
+        <AgentKeyGen />
+      </div>
       <AgentDocs />
     </main>
   );

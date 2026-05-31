@@ -112,7 +112,9 @@ export function CursorAscii() {
         pointer.y,
         RADIUS
       );
-      halo.addColorStop(0, withAlpha(isDark ? fg : accent, 0.09));
+      // Light mode reads brighter, so keep its glow gentler than dark mode.
+      const haloAlpha = isDark ? 0.09 : 0.04;
+      halo.addColorStop(0, withAlpha(isDark ? fg : accent, haloAlpha));
       halo.addColorStop(1, withAlpha(isDark ? fg : accent, 0));
       ctx!.fillStyle = halo;
       ctx!.beginPath();
@@ -122,6 +124,8 @@ export function CursorAscii() {
       // Glyphs, each with a soft halo via shadowBlur for the glow.
       ctx!.fillStyle = fg;
       ctx!.shadowColor = glowColor();
+      const maxAlpha = isDark ? MAX_ALPHA : 0.4;
+      const blurScale = isDark ? 6 : 3;
       const minCol = Math.max(0, Math.floor((pointer.x - RADIUS) / CELL));
       const maxCol = Math.min(cols - 1, Math.ceil((pointer.x + RADIUS) / CELL));
       const minRow = Math.max(0, Math.floor((pointer.y - RADIUS) / CELL));
@@ -135,8 +139,8 @@ export function CursorAscii() {
           if (dist > RADIUS) continue;
           // Smooth falloff, brightest at the center of the spotlight.
           const t = 1 - dist / RADIUS;
-          ctx!.globalAlpha = t * t * MAX_ALPHA;
-          ctx!.shadowBlur = 6 * t; // halo strongest at the center
+          ctx!.globalAlpha = t * t * maxAlpha;
+          ctx!.shadowBlur = blurScale * t; // halo strongest at the center
           ctx!.fillText(chars[r * cols + c], cx, cy);
         }
       }

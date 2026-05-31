@@ -41,7 +41,7 @@ function verifyUrlFor(req: NextRequest, objectId: string | null): string {
 export async function POST(req: NextRequest) {
   try {
     // 1) Authenticate the agent, resolving its keypair and address.
-    const { keypair, address } = resolveAgent(getApiKey(req));
+    const { keypair, address, keyLabel } = resolveAgent(getApiKey(req));
 
     // 2) Gather content, provenance and label from JSON or multipart.
     const contentType = req.headers.get("content-type") ?? "";
@@ -127,12 +127,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // The key's label identifies the signer in the registry. Use the caller's
+    // label if given, otherwise fall back to the key label.
+    const finalLabel = (label || keyLabel || "").slice(0, 200);
+
     // 4) Sign with the agent keypair and submit through Tatum.
     const { digest, objectId } = await agentSignAndSubmit(keypair, {
       walrusBlobId: blobId,
       sha256Hex: sha256,
       provenanceType,
-      label,
+      label: finalLabel,
     });
 
     return NextResponse.json({
