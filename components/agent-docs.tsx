@@ -44,6 +44,18 @@ const SIGN_FILE = `curl -X POST https://YOUR_APP/api/sign \\
   -F "provenanceType=1" \\
   -F "label=generated image"`;
 
+const SIGN_FILE_WIN = `curl.exe -X POST "https://YOUR_APP/api/sign" -H "x-api-key: YOUR_AGENT_KEY" -F "file=@output.png" -F "provenanceType=1" -F "label=generated image"`;
+
+// Invoke-RestMethod -Form needs PowerShell 7+. It sends multipart/form-data.
+const SIGN_FILE_POWERSHELL = `Invoke-RestMethod -Uri "https://YOUR_APP/api/sign" \`
+  -Method Post \`
+  -Headers @{ "x-api-key" = "YOUR_AGENT_KEY" } \`
+  -Form @{
+    file           = Get-Item "output.png"
+    provenanceType = 1
+    label          = "generated image"
+  }`;
+
 const VERIFY_CURL = `# Verify by Sigil ID
 curl -X POST https://YOUR_APP/api/verify \\
   -F "sigilId=0xbf93ae06...874f"
@@ -51,6 +63,29 @@ curl -X POST https://YOUR_APP/api/verify \\
 # Or verify a file by recomputing its sha256
 curl -X POST https://YOUR_APP/api/verify \\
   -F "file=@output.png"`;
+
+const VERIFY_WIN = `# Verify by Sigil ID
+curl.exe -X POST "https://YOUR_APP/api/verify" -F "sigilId=0xbf93ae06...874f"
+
+# Or verify a file by recomputing its sha256
+curl.exe -X POST "https://YOUR_APP/api/verify" -F "file=@output.png"`;
+
+const VERIFY_POWERSHELL = `# Verify by Sigil ID
+Invoke-RestMethod -Uri "https://YOUR_APP/api/verify" \`
+  -Method Post -Form @{ sigilId = "0xbf93ae06...874f" }
+
+# Or verify a file (PowerShell 7+)
+Invoke-RestMethod -Uri "https://YOUR_APP/api/verify" \`
+  -Method Post -Form @{ file = Get-Item "output.png" }`;
+
+const VERIFY_JS = `const form = new FormData();
+form.set("sigilId", "0xbf93ae06...874f");
+// or: form.set("file", fileBlob);
+const res = await fetch("https://YOUR_APP/api/verify", {
+  method: "POST",
+  body: form,
+});
+const { verdict, attestation } = await res.json();`;
 
 const JS_SNIPPET = `const res = await fetch("https://YOUR_APP/api/sign", {
   method: "POST",
@@ -85,7 +120,14 @@ export function AgentDocs() {
         ]}
       />
       <Block title="Response" code={SIGN_RESPONSE} />
-      <Block title="Sign a file" code={SIGN_FILE} />
+      <TabbedBlock
+        title="Sign a file"
+        tabs={[
+          { label: "curl", code: SIGN_FILE },
+          { label: "Windows curl", code: SIGN_FILE_WIN },
+          { label: "PowerShell", code: SIGN_FILE_POWERSHELL },
+        ]}
+      />
 
       <div className="rounded-xl border border-hairline bg-surface p-4">
         <p className="mb-2 font-mono text-xs uppercase tracking-wide text-muted">
@@ -109,7 +151,15 @@ export function AgentDocs() {
         path="/api/verify"
         desc="Check a file or a Sigil ID. Returns authentic, tampered, or not found, with the signer, time, and provenance type."
       />
-      <Block title="Verify" code={VERIFY_CURL} />
+      <TabbedBlock
+        title="Verify"
+        tabs={[
+          { label: "curl", code: VERIFY_CURL },
+          { label: "Windows curl", code: VERIFY_WIN },
+          { label: "PowerShell", code: VERIFY_POWERSHELL },
+          { label: "JavaScript", code: VERIFY_JS },
+        ]}
+      />
 
       <p className="text-sm text-muted">
         Replace YOUR_APP with this deployment origin and YOUR_AGENT_KEY with the
