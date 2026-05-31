@@ -9,6 +9,7 @@
 import { useCallback, useRef, useState } from "react";
 import { UploadSimple, Copy, Check, ArrowClockwise } from "@phosphor-icons/react";
 import { pixelsToAscii, ASCII_RAMP } from "@/lib/ascii";
+import { Button } from "./button";
 
 export function AsciiConverter() {
   const [ascii, setAscii] = useState<string | null>(null);
@@ -89,16 +90,15 @@ export function AsciiConverter() {
           uploaded.
         </p>
         <div className="mt-3 flex items-center gap-2">
-          <button
+          <Button
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={busy}
-            className="group relative inline-flex h-9 items-center justify-center gap-1.5 overflow-hidden rounded-full bg-wax px-4 text-sm font-medium transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
-            style={{ color: "var(--bg)" }}
+            size="sm"
           >
             <UploadSimple size={15} weight="regular" />
             {busy ? "Converting" : ascii ? "Replace" : "Upload"}
-          </button>
+          </Button>
           {ascii && (
             <button
               type="button"

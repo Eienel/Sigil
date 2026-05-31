@@ -76,6 +76,8 @@ export default function HomePage() {
           eyebrow="For people"
           title="Sign with your wallet"
           body="Connect, drop a file, choose a provenance type, and press your seal. The attestation lands on chain with your address."
+          openLabel="Open"
+          hoverLabel="Open as human"
         />
         <Lane
           href="/agents"
@@ -83,6 +85,8 @@ export default function HomePage() {
           eyebrow="For agents"
           title="Sign with an API key"
           body="One endpoint stores to Walrus and writes the attestation with a server side key. Each key maps to one Sui address."
+          openLabel="Open"
+          hoverLabel="For agents"
         />
       </section>
 
@@ -102,12 +106,16 @@ function Lane({
   eyebrow,
   title,
   body,
+  openLabel,
+  hoverLabel,
 }: {
   href: string;
   icon: React.ReactNode;
   eyebrow: string;
   title: string;
   body: string;
+  openLabel: string;
+  hoverLabel: string;
 }) {
   return (
     <Link
@@ -124,8 +132,20 @@ function Lane({
       </div>
       <h3 className="mt-4 text-xl font-medium text-ink">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+      {/* Label swaps on hover: the rest label slides up and out while the
+          hover label slides in from below, then the arrow nudges right. */}
       <span className="mt-4 flex items-center gap-1.5 text-sm font-medium text-wax">
-        Open
+        <span className="relative inline-grid overflow-hidden">
+          <span className="col-start-1 row-start-1 transition-all duration-200 ease-out group-hover:-translate-y-[140%] group-hover:opacity-0">
+            {openLabel}
+          </span>
+          <span
+            aria-hidden
+            className="col-start-1 row-start-1 translate-y-[140%] whitespace-nowrap opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100"
+          >
+            {hoverLabel}
+          </span>
+        </span>
         <ArrowRight
           size={15}
           weight="regular"

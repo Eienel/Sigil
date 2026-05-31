@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 import { SiteNav } from "@/components/site-nav";
+import { CursorAscii } from "@/components/cursor-ascii";
 
 export const metadata: Metadata = {
   title: "Sigil, verifiable provenance on Sui",
@@ -38,6 +39,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-[100dvh] antialiased">
         <Providers>
+          <CursorAscii />
           <SiteNav />
           {children}
         </Providers>
