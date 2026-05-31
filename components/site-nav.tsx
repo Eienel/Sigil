@@ -10,13 +10,18 @@ import { WaxSeal } from "./wax-seal";
 import { ThemeToggle } from "./theme-toggle";
 import { Proximity } from "./proximity";
 import { ButtonLink } from "./button";
+import { WiggleArrow } from "./wiggle-arrow";
 
+// Desktop nav links (no Home; the logo is home).
 const LINKS = [
   { href: "/app", label: "Sign" },
   { href: "/verify", label: "Verify" },
   { href: "/agents", label: "For agents" },
   { href: "/registry", label: "Registry" },
 ];
+
+// Mobile menu also offers an explicit Home item.
+const MOBILE_LINKS = [{ href: "/", label: "Home" }, ...LINKS];
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
 
@@ -91,6 +96,9 @@ export function SiteNav() {
         </div>
       </nav>
 
+      {/* Wiggly hint arrow pointing at the hamburger, mobile only. */}
+      <WiggleArrow hidden={open} />
+
       {/* Mobile sheet, portaled to body so the header backdrop-filter does not
           trap it in the wrong compositing layer (which made it see-through). */}
       {mounted &&
@@ -113,7 +121,7 @@ export function SiteNav() {
                 show: { transition: { staggerChildren: 0.04 } },
               }}
             >
-              {LINKS.map((l) => {
+              {MOBILE_LINKS.map((l) => {
                 const active = pathname === l.href;
                 return (
                   <motion.li
