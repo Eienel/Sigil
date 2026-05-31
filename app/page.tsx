@@ -68,27 +68,8 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      {/* Live image to ASCII tool */}
-      <section className="pb-16">
-        <Reveal>
-          <div className="mb-4">
-            <p className="font-mono text-xs uppercase tracking-wider text-muted">
-              Try it
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">
-              Anything becomes a mark
-            </h2>
-            <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-muted">
-              Drop an image to see it rendered as code, the same way Sigil
-              distills any file down to a compact, verifiable fingerprint.
-            </p>
-          </div>
-          <AsciiConverter />
-        </Reveal>
-      </section>
-
       {/* Two lanes */}
-      <section className="grid gap-4 pb-24 sm:grid-cols-2">
+      <section className="grid gap-4 pb-16 sm:grid-cols-2">
         <Lane
           href="/app"
           icon={<Feather size={22} weight="regular" />}
@@ -103,6 +84,13 @@ export default function HomePage() {
           title="Sign with an API key"
           body="One endpoint stores to Walrus and writes the attestation with a server side key. Each key maps to one Sui address."
         />
+      </section>
+
+      {/* Compact image to ASCII tool, last thing on the page */}
+      <section className="border-t border-hairline py-10 pb-24">
+        <Reveal>
+          <AsciiConverter />
+        </Reveal>
       </section>
     </main>
   );
