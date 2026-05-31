@@ -144,6 +144,13 @@ export function AgentDocs() {
             <span className="font-mono text-muted">2</span> AI assisted
           </li>
         </ul>
+        <p className="mt-3 border-t border-hairline pt-3 text-sm text-muted">
+          The provenance type is a declaration by the signer, not a detection.
+          Sigil records what you attest, it does not inspect the content to
+          decide how it was made. The agent key signs the record, so what it
+          proves is that this address attested these bytes at this time, under
+          this claim.
+        </p>
       </div>
 
       <Endpoint
