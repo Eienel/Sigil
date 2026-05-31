@@ -13,31 +13,31 @@ export function WiggleArrow({ hidden }: { hidden?: boolean }) {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed right-3 top-[3.6rem] z-30 sm:hidden"
+      className="pointer-events-none fixed right-4 top-[3.6rem] z-30 sm:hidden"
       initial={{ opacity: 0 }}
-      animate={{ opacity: hidden ? 0 : 0.8 }}
+      animate={{ opacity: hidden ? 0 : 0.4 }}
       transition={{ duration: 0.4 }}
     >
       <motion.svg
-        width="46"
-        height="58"
-        viewBox="0 0 46 58"
+        width="32"
+        height="60"
+        viewBox="0 0 32 60"
         fill="none"
         animate={
           reduce
             ? {}
-            : { rotate: [-3, 3, -3], y: [0, -2, 0] }
+            : { rotate: [-2, 2, -2], y: [0, -2, 0] }
         }
         transition={
           reduce
             ? {}
             : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
         }
-        style={{ transformOrigin: "80% 10%" }}
+        style={{ transformOrigin: "50% 8%" }}
       >
-        {/* curved shaft sweeping up toward the menu button */}
+        {/* mostly vertical hand-drawn wiggle pointing up at the menu */}
         <motion.path
-          d="M30 54 C8 46 6 28 18 18 C24 13 34 12 38 8"
+          d="M16 56 C10 49 22 43 14 36 C7 30 21 24 15 17 C13 14 15 12 16 10"
           stroke="var(--accent)"
           strokeWidth="2"
           strokeLinecap="round"
@@ -47,7 +47,7 @@ export function WiggleArrow({ hidden }: { hidden?: boolean }) {
         />
         {/* arrowhead at the top */}
         <motion.path
-          d="M30 9 L38 7 L37 15"
+          d="M10 17 L16 9 L22 17"
           stroke="var(--accent)"
           strokeWidth="2"
           strokeLinecap="round"
