@@ -4,6 +4,7 @@ import { InlineDemo } from "@/components/inline-demo";
 import { Reveal } from "@/components/reveal";
 import { ButtonLink } from "@/components/button";
 import { HeroCodeArt } from "@/components/hero-code-art";
+import { FlowMap } from "@/components/flow-map";
 import { AsciiConverter } from "@/components/ascii-converter";
 
 export default function HomePage() {
@@ -88,6 +89,11 @@ export default function HomePage() {
           openLabel="Open"
           hoverLabel="For agents"
         />
+      </section>
+
+      {/* How it works flow map */}
+      <section className="border-t border-hairline py-12">
+        <FlowMap />
       </section>
 
       {/* Compact image to ASCII tool, last thing on the page */}
