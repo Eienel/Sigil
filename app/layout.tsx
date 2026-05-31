@@ -29,10 +29,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Set the theme class before paint to avoid a flash of the wrong mode */}
+        {/* Default to light. Only go dark if the user explicitly chose it. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('sigil-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+            __html: `(function(){try{if(localStorage.getItem('sigil-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
           }}
         />
       </head>

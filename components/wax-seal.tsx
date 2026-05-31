@@ -1,15 +1,18 @@
 "use client";
 
+import { useId } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
-type Variant = "filled" | "engraved";
+type Variant = "filled" | "engraved" | "assisted";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
 
 /*
   The Sigil signet. A wax seal stamped with a monogram.
-  filled   -> human signature, solid wax
-  engraved -> AI agent signature, outline only, same accent
+  filled    -> human made, solid wax
+  engraved  -> AI generated, outline only, same accent
+  assisted  -> AI assisted, split diagonally: solid wax on one half,
+               engraved outline on the other, so it reads as both at once.
   Animate transform and opacity only.
 */
 export function WaxSeal({
@@ -26,7 +29,21 @@ export function WaxSeal({
   title?: string;
 }) {
   const reduce = useReducedMotion();
+  const uid = useId().replace(/:/g, "");
   const isFilled = variant === "filled";
+  const isAssisted = variant === "assisted";
+
+  const label =
+    title ??
+    (variant === "filled"
+      ? "Human wax seal"
+      : variant === "assisted"
+        ? "AI assisted wax seal"
+        : "Agent wax seal");
+
+  // Diagonal split: lower-left triangle is filled, upper-right is engraved.
+  const lowerLeftClip = `${uid}-ll`;
+  const upperRightClip = `${uid}-ur`;
 
   return (
     <motion.svg
@@ -35,35 +52,76 @@ export function WaxSeal({
       viewBox="0 0 100 100"
       className={className}
       role="img"
-      aria-label={title ?? (isFilled ? "Human wax seal" : "Agent wax seal")}
+      aria-label={label}
       initial={false}
-      animate={
-        reduce
-          ? {}
-          : pressed
-            ? { scale: 1, rotate: 0 }
-            : { scale: 1, rotate: 0 }
-      }
+      animate={reduce ? {} : pressed ? { scale: 1, rotate: 0 } : { scale: 1, rotate: 0 }}
     >
       {title ? <title>{title}</title> : null}
 
-      {/* Outer scalloped wax rim */}
-      <Scallop filled={isFilled} />
+      {isAssisted ? (
+        <>
+          <defs>
+            {/* split along the main diagonal (top-left to bottom-right) */}
+            <clipPath id={lowerLeftClip}>
+              <polygon points="0,0 0,100 100,100" />
+            </clipPath>
+            <clipPath id={upperRightClip}>
+              <polygon points="0,0 100,0 100,100" />
+            </clipPath>
+          </defs>
 
-      {/* Inner ring */}
-      <circle
-        cx="50"
-        cy="50"
-        r="30"
-        fill="none"
-        stroke={isFilled ? "color-mix(in srgb, white 18%, transparent)" : "var(--accent)"}
-        strokeOpacity={isFilled ? 1 : 0.5}
-        strokeWidth="1.5"
-      />
+          {/* Filled half (lower-left triangle) */}
+          <g clipPath={`url(#${lowerLeftClip})`}>
+            <Scallop filled />
+            <InnerRing filled />
+          </g>
+          {/* Engraved half (upper-right triangle) */}
+          <g clipPath={`url(#${upperRightClip})`}>
+            <Scallop filled={false} />
+            <InnerRing filled={false} />
+          </g>
 
-      {/* Monogram: a stylized sigil mark */}
-      <Monogram filled={isFilled} />
+          {/* Diagonal seam line */}
+          <line
+            x1="11"
+            y1="11"
+            x2="89"
+            y2="89"
+            stroke="var(--accent)"
+            strokeWidth="1.25"
+            strokeOpacity="0.55"
+          />
+
+          {/* Monogram: split colors per half so it reads on both sides */}
+          <g clipPath={`url(#${lowerLeftClip})`}>
+            <Monogram filled />
+          </g>
+          <g clipPath={`url(#${upperRightClip})`}>
+            <Monogram filled={false} />
+          </g>
+        </>
+      ) : (
+        <>
+          <Scallop filled={isFilled} />
+          <InnerRing filled={isFilled} />
+          <Monogram filled={isFilled} />
+        </>
+      )}
     </motion.svg>
+  );
+}
+
+function InnerRing({ filled }: { filled: boolean }) {
+  return (
+    <circle
+      cx="50"
+      cy="50"
+      r="30"
+      fill="none"
+      stroke={filled ? "color-mix(in srgb, white 18%, transparent)" : "var(--accent)"}
+      strokeOpacity={filled ? 1 : 0.5}
+      strokeWidth="1.5"
+    />
   );
 }
 
@@ -101,12 +159,7 @@ function Scallop({ filled }: { filled: boolean }) {
   }
 
   return (
-    <g
-      fill="none"
-      stroke="var(--accent)"
-      strokeWidth="1.5"
-      strokeOpacity="0.85"
-    >
+    <g fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeOpacity="0.85">
       <g fill="var(--accent)" fillOpacity="0.9" stroke="none">
         {teeth}
       </g>

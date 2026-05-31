@@ -3,12 +3,14 @@ import { Feather, Robot, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { InlineDemo } from "@/components/inline-demo";
 import { Reveal } from "@/components/reveal";
 import { ButtonLink } from "@/components/button";
+import { HeroCodeArt } from "@/components/hero-code-art";
 
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl px-5">
       {/* Hero, split layout, left aligned */}
-      <section className="grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-0">
+      <section className="relative grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-0">
+        <HeroCodeArt />
         <div>
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-hairline bg-surface px-3 py-1 font-mono text-xs text-muted">

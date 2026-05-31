@@ -22,14 +22,12 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
+    // Light is the default. Dark only if the user explicitly chose it before.
     const stored =
-      (typeof localStorage !== "undefined" &&
-        (localStorage.getItem("sigil-theme") as Theme | null)) ||
-      null;
-    const system = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-    setTheme(stored ?? system);
+      typeof localStorage !== "undefined"
+        ? (localStorage.getItem("sigil-theme") as Theme | null)
+        : null;
+    setTheme(stored === "dark" ? "dark" : "light");
   }, []);
 
   function toggle() {
