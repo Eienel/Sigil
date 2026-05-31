@@ -4,6 +4,7 @@ import { InlineDemo } from "@/components/inline-demo";
 import { Reveal } from "@/components/reveal";
 import { ButtonLink } from "@/components/button";
 import { HeroCodeArt } from "@/components/hero-code-art";
+import { AsciiConverter } from "@/components/ascii-converter";
 
 export default function HomePage() {
   return (
@@ -64,6 +65,25 @@ export default function HomePage() {
 
         <Reveal delay={0.2}>
           <InlineDemo />
+        </Reveal>
+      </section>
+
+      {/* Live image to ASCII tool */}
+      <section className="pb-16">
+        <Reveal>
+          <div className="mb-4">
+            <p className="font-mono text-xs uppercase tracking-wider text-muted">
+              Try it
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">
+              Anything becomes a mark
+            </h2>
+            <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-muted">
+              Drop an image to see it rendered as code, the same way Sigil
+              distills any file down to a compact, verifiable fingerprint.
+            </p>
+          </div>
+          <AsciiConverter />
         </Reveal>
       </section>
 
