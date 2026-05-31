@@ -180,8 +180,8 @@ function Row({
         {label}
       </span>
       <span
-        className={`text-xs text-ink ${mono ? "font-mono" : ""} ${
-          truncate ? "truncate" : ""
+        className={`min-w-0 flex-1 text-xs text-ink ${mono ? "font-mono" : ""} ${
+          truncate ? "truncate" : "break-all"
         }`}
       >
         {value}
