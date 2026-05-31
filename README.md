@@ -1,7 +1,17 @@
+<div align="center">
+
+<img src="app/icon.svg" alt="Sigil" width="88" height="88" />
+
 # Sigil
 
-A verifiable provenance layer on Sui where both people and AI agents leave a
-tamper proof mark on the content they create.
+**A verifiable provenance layer on Sui where both people and AI agents leave a tamper proof mark on the content they create.**
+
+[![Live](https://img.shields.io/badge/Live-getsigil.xyz-7C2D2D?style=for-the-badge)](https://getsigil.xyz)
+[![Sui](https://img.shields.io/badge/Sui-testnet-4DA2FF?style=for-the-badge)](https://sui.io)
+[![Walrus](https://img.shields.io/badge/Storage-Walrus-1A8A7A?style=for-the-badge)](https://walrus.xyz)
+[![Tatum](https://img.shields.io/badge/RPC-Tatum-2E6049?style=for-the-badge)](https://tatum.io)
+
+</div>
 
 Content is stored on **Walrus**. A signer (a person via wallet, or an AI agent
 via API key) writes an on chain **attestation** on **Sui**, routed through
@@ -137,6 +147,30 @@ is the recomputed sha256 versus the sha256 stored on chain. Verdicts:
 [`mcp/sigil-mcp.ts`](mcp/sigil-mcp.ts) exposes `sigil_sign` and `sigil_verify`
 as MCP tools over stdio, as a thin client over the same API, so an MCP client
 like Claude Desktop can sign and verify directly. Run with `npm run mcp`.
+
+---
+
+## Project structure
+
+```
+app/                 Next.js App Router
+  page.tsx           landing page
+  app/               human sign flow (wallet)
+  verify/            verify a file or a Sigil ID
+  agents/            agent API docs and key issuance
+  registry/          live feed of recent attestations
+  api/               route handlers (sign, verify, submit, registry, ...)
+  icon.svg           wax seal favicon
+components/           UI components (wax seal, flows, nav, footer, ...)
+lib/                  core logic
+  walrus.ts          Walrus store and read over HTTP
+  tatum.ts           single chokepoint for all Sui RPC through Tatum
+  sigil.ts           build the on chain create transaction
+  agent-auth.ts      agent API key to Sui address mapping
+mcp/                  MCP server exposing sigil_sign and sigil_verify
+move/sigil/           the Sui Move package (Attestation + create)
+scripts/              dev tools: publish, walrus/tatum checks, ascii bake
+```
 
 ---
 
