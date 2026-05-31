@@ -14,8 +14,8 @@
 import { useEffect, useRef } from "react";
 
 const CELL = 16; // px between glyphs
-const RADIUS = 78; // reveal radius in px
-const MAX_ALPHA = 0.5; // brightest a revealed glyph gets
+const RADIUS = 58; // reveal radius in px
+const MAX_ALPHA = 0.62; // brightest a revealed glyph gets
 const GLYPHS = "01<>/{}=+*;:#%$".split("");
 
 export function CursorAscii() {
@@ -37,12 +37,37 @@ export function CursorAscii() {
     let rows = 0;
     let chars: string[] = []; // stable glyph per cell
 
-    let fg = readFg();
-    function readFg() {
-      const c = getComputedStyle(document.documentElement)
-        .getPropertyValue("--fg")
+    let fg = readToken("--fg") || "#15120e";
+    let accent = readToken("--accent") || "#7c2d2d";
+    let isDark = document.documentElement.classList.contains("dark");
+    function readToken(name: string) {
+      return getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
         .trim();
-      return c || "#15120e";
+    }
+    // Glow color for the glyph halo. Dark mode glows because light glyphs sit
+    // on a dark field; in light mode we tint the halo with the wax accent so it
+    // reads as a warm luminous spot rather than plain dark text. The canvas
+    // shadow API needs a concrete color, so we use the resolved token.
+    function glowColor() {
+      return isDark ? fg : accent;
+    }
+    // Apply an alpha to a resolved color (hex or rgb[a]) for canvas gradients.
+    function withAlpha(color: string, a: number): string {
+      let rgb = color;
+      if (color.startsWith("#")) {
+        const h = color.slice(1);
+        const f =
+          h.length === 3
+            ? h.split("").map((x) => x + x).join("")
+            : h.padEnd(6, "0").slice(0, 6);
+        const n = parseInt(f, 16);
+        rgb = `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+      } else {
+        const m = color.match(/(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+        rgb = m ? `${m[1]}, ${m[2]}, ${m[3]}` : "124, 45, 45";
+      }
+      return `rgba(${rgb}, ${a})`;
     }
 
     function resize() {
@@ -76,8 +101,27 @@ export function CursorAscii() {
         running = false;
         return; // nothing to reveal; stop the loop until next move
       }
-      ctx!.fillStyle = fg;
 
+      // Soft radial backing so the spotlight reads as a warm glow, in light
+      // mode too (the wax tint), not just dark text.
+      const halo = ctx!.createRadialGradient(
+        pointer.x,
+        pointer.y,
+        0,
+        pointer.x,
+        pointer.y,
+        RADIUS
+      );
+      halo.addColorStop(0, withAlpha(isDark ? fg : accent, 0.09));
+      halo.addColorStop(1, withAlpha(isDark ? fg : accent, 0));
+      ctx!.fillStyle = halo;
+      ctx!.beginPath();
+      ctx!.arc(pointer.x, pointer.y, RADIUS, 0, Math.PI * 2);
+      ctx!.fill();
+
+      // Glyphs, each with a soft halo via shadowBlur for the glow.
+      ctx!.fillStyle = fg;
+      ctx!.shadowColor = glowColor();
       const minCol = Math.max(0, Math.floor((pointer.x - RADIUS) / CELL));
       const maxCol = Math.min(cols - 1, Math.ceil((pointer.x + RADIUS) / CELL));
       const minRow = Math.max(0, Math.floor((pointer.y - RADIUS) / CELL));
@@ -92,10 +136,12 @@ export function CursorAscii() {
           // Smooth falloff, brightest at the center of the spotlight.
           const t = 1 - dist / RADIUS;
           ctx!.globalAlpha = t * t * MAX_ALPHA;
+          ctx!.shadowBlur = 6 * t; // halo strongest at the center
           ctx!.fillText(chars[r * cols + c], cx, cy);
         }
       }
       ctx!.globalAlpha = 1;
+      ctx!.shadowBlur = 0;
       raf = requestAnimationFrame(draw);
     }
 
@@ -120,9 +166,11 @@ export function CursorAscii() {
       resize();
     }
 
-    // React to light/dark toggle so the glyph color stays correct.
+    // React to light/dark toggle so the glyph color and glow stay correct.
     const themeObserver = new MutationObserver(() => {
-      fg = readFg();
+      fg = readToken("--fg") || fg;
+      accent = readToken("--accent") || accent;
+      isDark = document.documentElement.classList.contains("dark");
     });
     themeObserver.observe(document.documentElement, {
       attributes: true,
