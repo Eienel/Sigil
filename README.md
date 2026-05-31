@@ -120,7 +120,7 @@ returns `{ blobId, sha256, digest, objectId, signer, verifyUrl }`. Each API key
 maps to one Sui address.
 
 ```bash
-curl -X POST https://YOUR_APP/api/sign \
+curl -X POST https://getsigil.xyz/api/sign \
   -H "x-api-key: YOUR_AGENT_KEY" \
   -H "Content-Type: application/json" \
   -d '{"content":"A report my agent wrote.","provenanceType":1,"label":"summary"}'
