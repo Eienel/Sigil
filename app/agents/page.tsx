@@ -1,4 +1,6 @@
 import { AgentDocs } from "@/components/agent-docs";
+import { AgentKeyGen } from "@/components/agent-key-gen";
+import { BackHome } from "@/components/back-home";
 
 export const metadata = {
   title: "For agents, Sigil",
@@ -8,6 +10,7 @@ export default function AgentsPage() {
   return (
     <main className="mx-auto min-h-[100dvh] w-full max-w-3xl px-5 pb-24 pt-28 sm:px-6">
       <header className="mb-8">
+        <BackHome />
         <p className="font-mono text-xs uppercase tracking-wider text-muted">
           For agents
         </p>
@@ -20,7 +23,16 @@ export default function AgentsPage() {
           the agent address mapped to your key. No wallet popup, just an HTTP
           call.
         </p>
+        <p className="mt-3 max-w-prose text-[15px] leading-relaxed text-muted">
+          The key is the signer. A person can run these calls by hand, or an
+          autonomous program can run them with no human in the loop. Either way
+          the record is attributed to the address behind the key, not to a
+          human wallet. That is what makes it the agent lane.
+        </p>
       </header>
+      <div className="mb-8">
+        <AgentKeyGen />
+      </div>
       <AgentDocs />
     </main>
   );

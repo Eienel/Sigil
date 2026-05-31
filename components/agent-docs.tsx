@@ -12,6 +12,22 @@ const SIGN_CURL = `curl -X POST https://YOUR_APP/api/sign \\
     "label": "weekly summary"
   }'`;
 
+// Windows PowerShell aliases curl to Invoke-WebRequest, which rejects -X/-H/-d
+// and the bash line continuation. Call curl.exe and keep it on one line.
+const SIGN_CURL_WIN = `curl.exe -X POST "https://YOUR_APP/api/sign" -H "x-api-key: YOUR_AGENT_KEY" -H "Content-Type: application/json" -d "{\\"content\\":\\"A report my agent just wrote.\\",\\"provenanceType\\":1,\\"label\\":\\"weekly summary\\"}"`;
+
+const SIGN_POWERSHELL = `$body = @{
+  content        = "A report my agent just wrote."
+  provenanceType = 1
+  label          = "weekly summary"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://YOUR_APP/api/sign" \`
+  -Method Post \`
+  -Headers @{ "x-api-key" = "YOUR_AGENT_KEY" } \`
+  -ContentType "application/json" \`
+  -Body $body`;
+
 const SIGN_RESPONSE = `{
   "blobId": "xEigi5zMrOOj59HL8upysFsHhrOWFRO3ImjfmZRJ1Pc",
   "sha256": "fddd6cc4...114968c",
@@ -28,6 +44,18 @@ const SIGN_FILE = `curl -X POST https://YOUR_APP/api/sign \\
   -F "provenanceType=1" \\
   -F "label=generated image"`;
 
+const SIGN_FILE_WIN = `curl.exe -X POST "https://YOUR_APP/api/sign" -H "x-api-key: YOUR_AGENT_KEY" -F "file=@output.png" -F "provenanceType=1" -F "label=generated image"`;
+
+// Invoke-RestMethod -Form needs PowerShell 7+. It sends multipart/form-data.
+const SIGN_FILE_POWERSHELL = `Invoke-RestMethod -Uri "https://YOUR_APP/api/sign" \`
+  -Method Post \`
+  -Headers @{ "x-api-key" = "YOUR_AGENT_KEY" } \`
+  -Form @{
+    file           = Get-Item "output.png"
+    provenanceType = 1
+    label          = "generated image"
+  }`;
+
 const VERIFY_CURL = `# Verify by Sigil ID
 curl -X POST https://YOUR_APP/api/verify \\
   -F "sigilId=0xbf93ae06...874f"
@@ -35,6 +63,29 @@ curl -X POST https://YOUR_APP/api/verify \\
 # Or verify a file by recomputing its sha256
 curl -X POST https://YOUR_APP/api/verify \\
   -F "file=@output.png"`;
+
+const VERIFY_WIN = `# Verify by Sigil ID
+curl.exe -X POST "https://YOUR_APP/api/verify" -F "sigilId=0xbf93ae06...874f"
+
+# Or verify a file by recomputing its sha256
+curl.exe -X POST "https://YOUR_APP/api/verify" -F "file=@output.png"`;
+
+const VERIFY_POWERSHELL = `# Verify by Sigil ID
+Invoke-RestMethod -Uri "https://YOUR_APP/api/verify" \`
+  -Method Post -Form @{ sigilId = "0xbf93ae06...874f" }
+
+# Or verify a file (PowerShell 7+)
+Invoke-RestMethod -Uri "https://YOUR_APP/api/verify" \`
+  -Method Post -Form @{ file = Get-Item "output.png" }`;
+
+const VERIFY_JS = `const form = new FormData();
+form.set("sigilId", "0xbf93ae06...874f");
+// or: form.set("file", fileBlob);
+const res = await fetch("https://YOUR_APP/api/verify", {
+  method: "POST",
+  body: form,
+});
+const { verdict, attestation } = await res.json();`;
 
 const JS_SNIPPET = `const res = await fetch("https://YOUR_APP/api/sign", {
   method: "POST",
@@ -59,9 +110,24 @@ export function AgentDocs() {
         desc="Store content on Walrus and write an attestation signed by your agent address. Authenticate with x-api-key or Authorization: Bearer."
       />
 
-      <Block title="Sign text" code={SIGN_CURL} />
+      <TabbedBlock
+        title="Sign text"
+        tabs={[
+          { label: "curl", code: SIGN_CURL },
+          { label: "Windows curl", code: SIGN_CURL_WIN },
+          { label: "PowerShell", code: SIGN_POWERSHELL },
+          { label: "JavaScript", code: JS_SNIPPET },
+        ]}
+      />
       <Block title="Response" code={SIGN_RESPONSE} />
-      <Block title="Sign a file" code={SIGN_FILE} />
+      <TabbedBlock
+        title="Sign a file"
+        tabs={[
+          { label: "curl", code: SIGN_FILE },
+          { label: "Windows curl", code: SIGN_FILE_WIN },
+          { label: "PowerShell", code: SIGN_FILE_POWERSHELL },
+        ]}
+      />
 
       <div className="rounded-xl border border-hairline bg-surface p-4">
         <p className="mb-2 font-mono text-xs uppercase tracking-wide text-muted">
@@ -78,6 +144,13 @@ export function AgentDocs() {
             <span className="font-mono text-muted">2</span> AI assisted
           </li>
         </ul>
+        <p className="mt-3 border-t border-hairline pt-3 text-sm text-muted">
+          The provenance type is a declaration by the signer, not a detection.
+          Sigil records what you attest, it does not inspect the content to
+          decide how it was made. The agent key signs the record, so what it
+          proves is that this address attested these bytes at this time, under
+          this claim.
+        </p>
       </div>
 
       <Endpoint
@@ -85,14 +158,22 @@ export function AgentDocs() {
         path="/api/verify"
         desc="Check a file or a Sigil ID. Returns authentic, tampered, or not found, with the signer, time, and provenance type."
       />
-      <Block title="Verify" code={VERIFY_CURL} />
-
-      <Block title="From JavaScript" code={JS_SNIPPET} />
+      <TabbedBlock
+        title="Verify"
+        tabs={[
+          { label: "curl", code: VERIFY_CURL },
+          { label: "Windows curl", code: VERIFY_WIN },
+          { label: "PowerShell", code: VERIFY_POWERSHELL },
+          { label: "JavaScript", code: VERIFY_JS },
+        ]}
+      />
 
       <p className="text-sm text-muted">
         Replace YOUR_APP with this deployment origin and YOUR_AGENT_KEY with the
         key issued to your agent. The agent key maps to one Sui address, so every
-        attestation it writes is attributable to that signer.
+        attestation it writes is attributable to that signer. On Windows
+        PowerShell, use the Windows curl or PowerShell tab, since the plain curl
+        examples are written for macOS and Linux.
       </p>
     </div>
   );
@@ -159,8 +240,81 @@ function Block({ title, code }: { title: string; code: string }) {
           )}
         </button>
       </div>
-      <pre className="overflow-x-auto px-4 py-3.5">
-        <code className="font-mono text-[13px] leading-relaxed text-ink">
+      <pre className="overflow-x-auto px-4 py-3.5 [-webkit-overflow-scrolling:touch]">
+        <code className="font-mono text-xs leading-relaxed text-ink sm:text-[13px]">
+          {code}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+function TabbedBlock({
+  title,
+  tabs,
+}: {
+  title: string;
+  tabs: { label: string; code: string }[];
+}) {
+  const [active, setActive] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const code = tabs[active].code;
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard not available, ignore
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-hairline bg-surface">
+      <div className="flex items-center justify-between border-b border-hairline px-4 py-2">
+        <span className="flex items-center gap-2 font-mono text-xs uppercase tracking-wide text-muted">
+          <Terminal size={14} weight="regular" />
+          {title}
+        </span>
+        <button
+          type="button"
+          onClick={copy}
+          className="flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink"
+          aria-label={`Copy ${title}`}
+        >
+          {copied ? (
+            <>
+              <Check size={14} weight="regular" style={{ color: "var(--verified)" }} />
+              Copied
+            </>
+          ) : (
+            <>
+              <Copy size={14} weight="regular" />
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      {/* Tab strip */}
+      <div className="flex flex-wrap gap-1 border-b border-hairline px-2 py-1.5">
+        {tabs.map((t, i) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={() => setActive(i)}
+            className={`rounded-full px-3 py-1 text-xs transition-colors ${
+              i === active
+                ? "bg-paper font-medium text-ink"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <pre className="overflow-x-auto px-4 py-3.5 [-webkit-overflow-scrolling:touch]">
+        <code className="font-mono text-xs leading-relaxed text-ink sm:text-[13px]">
           {code}
         </code>
       </pre>

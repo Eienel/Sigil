@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { Feather, SealCheck, ArrowClockwise } from "@phosphor-icons/react";
 import { WaxSeal } from "./wax-seal";
+import { Button } from "./button";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
 const SAMPLE = "I made this. Stamped on Sui, stored on Walrus.";
@@ -140,23 +141,23 @@ export function InlineDemo() {
 
       {/* Controls */}
       <div className="mt-4 flex gap-2">
-        <button
+        <Button
           onClick={sign}
           disabled={stage === "signing" || stage !== "idle"}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-wax px-4 py-2.5 text-sm font-medium transition-transform duration-200 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50"
-          style={{ color: "var(--bg)" }}
+          full
         >
           <Feather size={16} weight="regular" />
           {stage === "signing" ? "Pressing seal" : "Sign sample"}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={verify}
           disabled={stage !== "signed"}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full border border-hairline bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-transform duration-200 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-40"
+          variant="secondary"
+          full
         >
           <SealCheck size={16} weight="regular" />
           {stage === "verifying" ? "Verifying" : "Verify"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -179,8 +180,8 @@ function Row({
         {label}
       </span>
       <span
-        className={`text-xs text-ink ${mono ? "font-mono" : ""} ${
-          truncate ? "truncate" : ""
+        className={`min-w-0 flex-1 text-xs text-ink ${mono ? "font-mono" : ""} ${
+          truncate ? "truncate" : "break-all"
         }`}
       >
         {value}

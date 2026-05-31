@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowClockwise, Stack } from "@phosphor-icons/react";
 import { WaxSeal } from "./wax-seal";
+import { ButtonLink } from "./button";
 import { PROVENANCE_LABEL, type ProvenanceType } from "@/lib/sigil";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
@@ -25,8 +26,10 @@ export function RegistryFeed() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function load() {
-    setLoading(true);
+  async function load(opts: { silent?: boolean } = {}) {
+    // Only show the skeleton on the first load; background refreshes are silent
+    // so the feed does not flash while polling.
+    if (!opts.silent) setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/registry", { cache: "no-store" });
@@ -34,14 +37,33 @@ export function RegistryFeed() {
       if (!res.ok) throw new Error(data.error ?? "Could not load the registry.");
       setItems(data.items as Item[]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load the registry.");
+      if (!opts.silent) {
+        setError(e instanceof Error ? e.message : "Could not load the registry.");
+      }
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
   useEffect(() => {
     load();
+    // Refresh when the tab regains focus or becomes visible, so an attestation
+    // created elsewhere (the API, a curl, another tab) shows up on return.
+    function onFocus() {
+      load({ silent: true });
+    }
+    function onVisible() {
+      if (document.visibilityState === "visible") load({ silent: true });
+    }
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    // And poll gently while open.
+    const interval = setInterval(() => load({ silent: true }), 20000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(interval);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -53,7 +75,7 @@ export function RegistryFeed() {
         </span>
         <button
           type="button"
-          onClick={load}
+          onClick={() => load()}
           disabled={loading}
           className="flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink disabled:opacity-50"
         >
@@ -80,7 +102,12 @@ export function RegistryFeed() {
 }
 
 function Entry({ item, index }: { item: Item; index: number }) {
-  const human = item.provenanceType === 0;
+  const sealVariant =
+    item.provenanceType === 0
+      ? "filled"
+      : item.provenanceType === 2
+        ? "assisted"
+        : "engraved";
   const when = item.timestampMs
     ? new Date(item.timestampMs).toUTCString().replace(" GMT", " UTC")
     : "unknown time";
@@ -96,7 +123,7 @@ function Entry({ item, index }: { item: Item; index: number }) {
         className="flex items-start gap-4 rounded-2xl border border-hairline bg-surface p-4 transition-transform hover:scale-[1.005] active:scale-[0.997]"
       >
         <div className="mt-0.5 shrink-0">
-          <WaxSeal size={40} variant={human ? "filled" : "engraved"} />
+          <WaxSeal size={40} variant={sealVariant} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -150,13 +177,9 @@ function EmptyState() {
         Sign something on the app or through the agent API and it will show up
         here.
       </p>
-      <Link
-        href="/app"
-        className="mt-4 rounded-full bg-wax px-4 py-2 text-sm font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
-        style={{ color: "var(--bg)" }}
-      >
+      <ButtonLink href="/app" className="mt-4">
         Sign something
-      </Link>
+      </ButtonLink>
     </div>
   );
 }

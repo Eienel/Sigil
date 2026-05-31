@@ -12,6 +12,7 @@ import {
   MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { PROVENANCE_LABEL, type ProvenanceType } from "@/lib/sigil";
+import { Button, ButtonLink } from "./button";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
 
@@ -142,16 +143,14 @@ export function VerifyFlow() {
           disabled={busy}
           className="min-w-0 flex-1 rounded-xl border border-hairline bg-surface px-3.5 py-2.5 font-mono text-sm text-ink outline-none placeholder:font-sans placeholder:text-muted focus:border-wax"
         />
-        <button
+        <Button
           type="button"
           onClick={() => sigilId && runVerify({ id: sigilId })}
           disabled={busy || !sigilId}
-          className="flex items-center gap-2 rounded-xl bg-wax px-4 py-2.5 text-sm font-medium transition-transform hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50"
-          style={{ color: "var(--bg)" }}
         >
           <MagnifyingGlass size={16} weight="regular" />
           Look up
-        </button>
+        </Button>
       </div>
 
       {busy && <Skeleton />}
@@ -231,14 +230,16 @@ function ResultCard({ result }: { result: Result }) {
       </dl>
 
       <div className="p-4">
-        <a
+        <ButtonLink
           href={objUrl}
+          external
           target="_blank"
           rel="noreferrer"
-          className="flex w-full items-center justify-center rounded-full border border-hairline bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-transform hover:scale-[1.005] active:scale-[0.99]"
+          variant="secondary"
+          full
         >
           View on chain
-        </a>
+        </ButtonLink>
       </div>
     </motion.div>
   );
@@ -275,8 +276,8 @@ function Row({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-baseline gap-3 px-5 py-3">
-      <dt className="w-32 shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">
+    <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-3 sm:px-5">
+      <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted sm:w-32">
         {label}
       </dt>
       <dd className={`min-w-0 break-all text-sm text-ink ${mono ? "font-mono" : ""}`}>

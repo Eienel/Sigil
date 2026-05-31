@@ -68,18 +68,21 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-  }
-
-  body {
+    /* Root paints the paper background so a negative z-index cursor-ascii
+       canvas can sit behind page content but above this. */
     background-color: var(--bg);
-    color: var(--fg);
-    font-family: var(--font-sans);
-    /* Faint paper texture is the only allowed gradient */
     background-image: radial-gradient(
       circle at 50% 0%,
       color-mix(in srgb, var(--fg) 2%, transparent),
       transparent 60%
     );
+  }
+
+  body {
+    color: var(--fg);
+    font-family: var(--font-sans);
+    /* Body is transparent so the canvas behind it shows in open areas. */
+    background-color: transparent;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }

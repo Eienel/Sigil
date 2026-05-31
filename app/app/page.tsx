@@ -1,4 +1,5 @@
 import { SignFlow } from "@/components/sign-flow";
+import { BackHome } from "@/components/back-home";
 
 export const metadata = {
   title: "Sign with your wallet, Sigil",
@@ -8,6 +9,7 @@ export default function AppPage() {
   return (
     <main className="mx-auto min-h-[100dvh] w-full max-w-2xl px-5 pb-24 pt-28 sm:px-6">
       <header className="mb-8">
+        <BackHome />
         <p className="font-mono text-xs uppercase tracking-wider text-muted">
           For people
         </p>

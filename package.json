@@ -11,7 +11,8 @@
     "tatum:test": "tsx scripts/tatum-test.ts",
     "sigil:publish": "tsx scripts/publish.ts",
     "sigil:create": "tsx scripts/create-attestation.ts",
-    "mcp": "tsx mcp/sigil-mcp.ts"
+    "mcp": "tsx mcp/sigil-mcp.ts",
+    "ascii": "tsx scripts/img-to-ascii.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

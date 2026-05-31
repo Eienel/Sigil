@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 import { SiteNav } from "@/components/site-nav";
+import { CursorAscii } from "@/components/cursor-ascii";
 
 export const metadata: Metadata = {
   title: "Sigil, verifiable provenance on Sui",
@@ -29,15 +30,16 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Set the theme class before paint to avoid a flash of the wrong mode */}
+        {/* Default to light. Only go dark if the user explicitly chose it. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('sigil-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+            __html: `(function(){try{if(localStorage.getItem('sigil-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
           }}
         />
       </head>
       <body className="min-h-[100dvh] antialiased">
         <Providers>
+          <CursorAscii />
           <SiteNav />
           {children}
         </Providers>

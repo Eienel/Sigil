@@ -2,12 +2,17 @@ import Link from "next/link";
 import { Feather, Robot, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { InlineDemo } from "@/components/inline-demo";
 import { Reveal } from "@/components/reveal";
+import { ButtonLink } from "@/components/button";
+import { HeroCodeArt } from "@/components/hero-code-art";
+import { FlowMap } from "@/components/flow-map";
+import { AsciiConverter } from "@/components/ascii-converter";
 
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl px-5">
       {/* Hero, split layout, left aligned */}
-      <section className="grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-0">
+      <section className="relative grid min-h-[calc(100dvh-4rem)] items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-0">
+        <HeroCodeArt />
         <div>
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-hairline bg-surface px-3 py-1 font-mono text-xs text-muted">
@@ -31,25 +36,30 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={0.15}>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ButtonLink
                 href="/app"
-                className="group flex items-center gap-2 rounded-full bg-wax px-5 py-3 text-sm font-medium transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                style={{ color: "var(--bg)" }}
+                size="lg"
+                className="w-full sm:w-auto"
+                hoverLabel={
+                  <>
+                    Press your seal
+                    <ArrowRight size={16} weight="regular" />
+                  </>
+                }
               >
                 Sign something
-                <ArrowRight
-                  size={16}
-                  weight="regular"
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                />
-              </Link>
-              <Link
+                <ArrowRight size={16} weight="regular" />
+              </ButtonLink>
+              <ButtonLink
                 href="/verify"
-                className="rounded-full border border-hairline bg-surface px-5 py-3 text-sm font-medium text-ink transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                variant="secondary"
+                size="lg"
+                className="w-full sm:w-auto"
+                hoverLabel="Check authenticity"
               >
                 Verify a file
-              </Link>
+              </ButtonLink>
             </div>
           </Reveal>
         </div>
@@ -60,13 +70,15 @@ export default function HomePage() {
       </section>
 
       {/* Two lanes */}
-      <section className="grid gap-4 pb-24 sm:grid-cols-2">
+      <section className="grid gap-4 pb-16 sm:grid-cols-2">
         <Lane
           href="/app"
           icon={<Feather size={22} weight="regular" />}
           eyebrow="For people"
           title="Sign with your wallet"
           body="Connect, drop a file, choose a provenance type, and press your seal. The attestation lands on chain with your address."
+          openLabel="Open"
+          hoverLabel="Open as human"
         />
         <Lane
           href="/agents"
@@ -74,7 +86,21 @@ export default function HomePage() {
           eyebrow="For agents"
           title="Sign with an API key"
           body="One endpoint stores to Walrus and writes the attestation with a server side key. Each key maps to one Sui address."
+          openLabel="Open"
+          hoverLabel="For agents"
         />
+      </section>
+
+      {/* How it works flow map */}
+      <section className="border-t border-hairline py-12">
+        <FlowMap />
+      </section>
+
+      {/* Compact image to ASCII tool, last thing on the page */}
+      <section className="border-t border-hairline py-10 pb-24">
+        <Reveal>
+          <AsciiConverter />
+        </Reveal>
       </section>
     </main>
   );
@@ -86,12 +112,16 @@ function Lane({
   eyebrow,
   title,
   body,
+  openLabel,
+  hoverLabel,
 }: {
   href: string;
   icon: React.ReactNode;
   eyebrow: string;
   title: string;
   body: string;
+  openLabel: string;
+  hoverLabel: string;
 }) {
   return (
     <Link
@@ -108,8 +138,20 @@ function Lane({
       </div>
       <h3 className="mt-4 text-xl font-medium text-ink">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+      {/* Label swaps on hover: the rest label slides up and out while the
+          hover label slides in from below, then the arrow nudges right. */}
       <span className="mt-4 flex items-center gap-1.5 text-sm font-medium text-wax">
-        Open
+        <span className="relative inline-grid overflow-hidden">
+          <span className="col-start-1 row-start-1 transition-all duration-200 ease-out group-hover:-translate-y-[140%] group-hover:opacity-0">
+            {openLabel}
+          </span>
+          <span
+            aria-hidden
+            className="col-start-1 row-start-1 translate-y-[140%] whitespace-nowrap opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100"
+          >
+            {hoverLabel}
+          </span>
+        </span>
         <ArrowRight
           size={15}
           weight="regular"
