@@ -14,7 +14,7 @@
 import { useEffect, useRef } from "react";
 
 const CELL = 16; // px between glyphs
-const RADIUS = 120; // reveal radius in px
+const RADIUS = 78; // reveal radius in px
 const MAX_ALPHA = 0.5; // brightest a revealed glyph gets
 const GLYPHS = "01<>/{}=+*;:#%$".split("");
 
@@ -150,7 +150,9 @@ export function CursorAscii() {
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-20"
+      // Behind page content (negative z) but above the html background, so
+      // glyphs reveal in open areas and never draw over buttons or text.
+      className="pointer-events-none fixed inset-0 -z-10"
     />
   );
 }
