@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "./providers";
 import { SiteNav } from "@/components/site-nav";
+import { SiteFooter } from "@/components/site-footer";
 import { CursorAscii } from "@/components/cursor-ascii";
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({
           <CursorAscii />
           <SiteNav />
           {children}
+          <SiteFooter />
         </Providers>
       </body>
     </html>

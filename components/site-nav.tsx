@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { List, X } from "@phosphor-icons/react";
+import { List, X, GithubLogo } from "@phosphor-icons/react";
 import { WaxSeal } from "./wax-seal";
 import { ThemeToggle } from "./theme-toggle";
 import { Proximity } from "./proximity";
@@ -74,6 +74,16 @@ export function SiteNav() {
         </Proximity>
 
         <div className="flex items-center gap-2">
+          {/* Source repo, desktop only (the footer carries it on mobile). */}
+          <Link
+            href="https://github.com/Eienel/Sigil"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View source on GitHub"
+            className="hidden h-10 w-10 items-center justify-center rounded-full border border-hairline text-ink transition-colors hover:bg-surface sm:flex"
+          >
+            <GithubLogo size={18} weight="regular" />
+          </Link>
           <ThemeToggle />
           <ButtonLink href="/app" size="sm" className="hidden sm:inline-flex">
             Open app
