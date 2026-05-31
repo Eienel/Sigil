@@ -26,8 +26,10 @@ export function RegistryFeed() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function load() {
-    setLoading(true);
+  async function load(opts: { silent?: boolean } = {}) {
+    // Only show the skeleton on the first load; background refreshes are silent
+    // so the feed does not flash while polling.
+    if (!opts.silent) setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/registry", { cache: "no-store" });
@@ -35,14 +37,33 @@ export function RegistryFeed() {
       if (!res.ok) throw new Error(data.error ?? "Could not load the registry.");
       setItems(data.items as Item[]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load the registry.");
+      if (!opts.silent) {
+        setError(e instanceof Error ? e.message : "Could not load the registry.");
+      }
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
   useEffect(() => {
     load();
+    // Refresh when the tab regains focus or becomes visible, so an attestation
+    // created elsewhere (the API, a curl, another tab) shows up on return.
+    function onFocus() {
+      load({ silent: true });
+    }
+    function onVisible() {
+      if (document.visibilityState === "visible") load({ silent: true });
+    }
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    // And poll gently while open.
+    const interval = setInterval(() => load({ silent: true }), 20000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(interval);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -54,7 +75,7 @@ export function RegistryFeed() {
         </span>
         <button
           type="button"
-          onClick={load}
+          onClick={() => load()}
           disabled={loading}
           className="flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink disabled:opacity-50"
         >

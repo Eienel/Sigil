@@ -127,9 +127,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // The key's label identifies the signer in the registry. Use the caller's
-    // label if given, otherwise fall back to the key label.
-    const finalLabel = (label || keyLabel || "").slice(0, 200);
+    // The key label identifies the signing agent; the request label describes
+    // this specific content. Keep both so the signer stays recognizable in the
+    // registry: "<agent>: <content label>", falling back to whichever exists.
+    const finalLabel = (
+      keyLabel && label
+        ? `${keyLabel}: ${label}`
+        : label || keyLabel || ""
+    ).slice(0, 200);
 
     // 4) Sign with the agent keypair and submit through Tatum.
     const { digest, objectId } = await agentSignAndSubmit(keypair, {

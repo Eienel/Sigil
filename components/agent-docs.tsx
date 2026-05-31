@@ -12,6 +12,22 @@ const SIGN_CURL = `curl -X POST https://YOUR_APP/api/sign \\
     "label": "weekly summary"
   }'`;
 
+// Windows PowerShell aliases curl to Invoke-WebRequest, which rejects -X/-H/-d
+// and the bash line continuation. Call curl.exe and keep it on one line.
+const SIGN_CURL_WIN = `curl.exe -X POST "https://YOUR_APP/api/sign" -H "x-api-key: YOUR_AGENT_KEY" -H "Content-Type: application/json" -d "{\\"content\\":\\"A report my agent just wrote.\\",\\"provenanceType\\":1,\\"label\\":\\"weekly summary\\"}"`;
+
+const SIGN_POWERSHELL = `$body = @{
+  content        = "A report my agent just wrote."
+  provenanceType = 1
+  label          = "weekly summary"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://YOUR_APP/api/sign" \`
+  -Method Post \`
+  -Headers @{ "x-api-key" = "YOUR_AGENT_KEY" } \`
+  -ContentType "application/json" \`
+  -Body $body`;
+
 const SIGN_RESPONSE = `{
   "blobId": "xEigi5zMrOOj59HL8upysFsHhrOWFRO3ImjfmZRJ1Pc",
   "sha256": "fddd6cc4...114968c",
@@ -59,7 +75,15 @@ export function AgentDocs() {
         desc="Store content on Walrus and write an attestation signed by your agent address. Authenticate with x-api-key or Authorization: Bearer."
       />
 
-      <Block title="Sign text" code={SIGN_CURL} />
+      <TabbedBlock
+        title="Sign text"
+        tabs={[
+          { label: "curl", code: SIGN_CURL },
+          { label: "Windows curl", code: SIGN_CURL_WIN },
+          { label: "PowerShell", code: SIGN_POWERSHELL },
+          { label: "JavaScript", code: JS_SNIPPET },
+        ]}
+      />
       <Block title="Response" code={SIGN_RESPONSE} />
       <Block title="Sign a file" code={SIGN_FILE} />
 
@@ -87,12 +111,12 @@ export function AgentDocs() {
       />
       <Block title="Verify" code={VERIFY_CURL} />
 
-      <Block title="From JavaScript" code={JS_SNIPPET} />
-
       <p className="text-sm text-muted">
         Replace YOUR_APP with this deployment origin and YOUR_AGENT_KEY with the
         key issued to your agent. The agent key maps to one Sui address, so every
-        attestation it writes is attributable to that signer.
+        attestation it writes is attributable to that signer. On Windows
+        PowerShell, use the Windows curl or PowerShell tab, since the plain curl
+        examples are written for macOS and Linux.
       </p>
     </div>
   );
@@ -158,6 +182,79 @@ function Block({ title, code }: { title: string; code: string }) {
             </>
           )}
         </button>
+      </div>
+      <pre className="overflow-x-auto px-4 py-3.5 [-webkit-overflow-scrolling:touch]">
+        <code className="font-mono text-xs leading-relaxed text-ink sm:text-[13px]">
+          {code}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+function TabbedBlock({
+  title,
+  tabs,
+}: {
+  title: string;
+  tabs: { label: string; code: string }[];
+}) {
+  const [active, setActive] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const code = tabs[active].code;
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard not available, ignore
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-hairline bg-surface">
+      <div className="flex items-center justify-between border-b border-hairline px-4 py-2">
+        <span className="flex items-center gap-2 font-mono text-xs uppercase tracking-wide text-muted">
+          <Terminal size={14} weight="regular" />
+          {title}
+        </span>
+        <button
+          type="button"
+          onClick={copy}
+          className="flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink"
+          aria-label={`Copy ${title}`}
+        >
+          {copied ? (
+            <>
+              <Check size={14} weight="regular" style={{ color: "var(--verified)" }} />
+              Copied
+            </>
+          ) : (
+            <>
+              <Copy size={14} weight="regular" />
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      {/* Tab strip */}
+      <div className="flex flex-wrap gap-1 border-b border-hairline px-2 py-1.5">
+        {tabs.map((t, i) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={() => setActive(i)}
+            className={`rounded-full px-3 py-1 text-xs transition-colors ${
+              i === active
+                ? "bg-paper font-medium text-ink"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
       <pre className="overflow-x-auto px-4 py-3.5 [-webkit-overflow-scrolling:touch]">
         <code className="font-mono text-xs leading-relaxed text-ink sm:text-[13px]">
