@@ -1,5 +1,5 @@
 /**
- * Sigil MCP server (Phase 7).
+ * Sigil MCP server.
  *
  * Exposes Sigil's provenance actions as MCP tools so an AI agent can sign and
  * verify content through the same HTTP API the rest of the app uses. This keeps

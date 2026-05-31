@@ -1,6 +1,6 @@
 /**
- * Phase 3 check: call sigil::create through Tatum, then read the resulting
- * Attestation object and the AttestationCreated event back through Tatum.
+ * Call sigil::create through Tatum, then read the resulting Attestation object
+ * and the AttestationCreated event back through Tatum.
  *
  * End to end: stores real content on Walrus, then attests it on chain.
  *
@@ -38,7 +38,7 @@ async function main() {
   console.log("");
 
   // 1) Real content -> Walrus -> sha256.
-  const content = `Sigil Phase 3 attestation. ${new Date().toISOString()}`;
+  const content = `Sigil attestation check. ${new Date().toISOString()}`;
   const sha256Hex = createHash("sha256").update(content).digest("hex");
   console.log("Storing content on Walrus ...");
   const stored = await storeBlob(content, 1);
@@ -51,7 +51,7 @@ async function main() {
     walrusBlobId: stored.blobId,
     sha256Hex,
     provenanceType: PROVENANCE.HUMAN,
-    label: "Phase 3 check",
+    label: "attestation check",
   });
   tx.setSender(sender);
   tx.setGasPrice(BigInt(await getReferenceGasPrice()));

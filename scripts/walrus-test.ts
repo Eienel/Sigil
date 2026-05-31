@@ -1,6 +1,6 @@
 /**
- * Phase 1 check: store one blob on Walrus and read it back, proving the
- * round trip and that content matches.
+ * Store one blob on Walrus and read it back, proving the round trip and that
+ * content matches.
  *
  * Run: npm run walrus:test
  */
@@ -18,7 +18,7 @@ function sha256(bytes: Uint8Array): string {
 }
 
 async function main() {
-  const content = `Sigil Phase 1 Walrus check. Stored at ${new Date().toISOString()}.`;
+  const content = `Sigil Walrus check. Stored at ${new Date().toISOString()}.`;
   const bytes = new TextEncoder().encode(content);
 
   console.log("Publisher: ", getPublisherUrl());

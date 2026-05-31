@@ -1,6 +1,6 @@
 /**
- * Phase 2 check: read chain data through Tatum and print results, proving the
- * API key and the Tatum Sui RPC endpoint work. No direct fullnode is used.
+ * Read chain data through Tatum and print results, proving the API key and the
+ * Tatum Sui RPC endpoint work. No direct fullnode is used.
  *
  * Run: npm run tatum:test
  */

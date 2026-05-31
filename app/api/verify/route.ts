@@ -6,7 +6,7 @@
  * The primary tamper check is sha256: the recomputed hash of the submitted file
  * versus the sha256 stored on chain. We also fetch the stored Walrus blob to
  * confirm it is retrievable. Re-deriving the Walrus blob id is deliberately not
- * used, sha256 is the source of truth (see CLAUDE.md VERIFY LOGIC).
+ * used, sha256 is the source of truth.
  *
  * Verdicts: "authentic" | "tampered" | "not_found".
  */
