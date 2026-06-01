@@ -8,9 +8,33 @@ import { SiteFooter } from "@/components/site-footer";
 import { CursorAscii } from "@/components/cursor-ascii";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://getsigil.xyz"),
   title: "Sigil, verifiable provenance on Sui",
   description:
     "Sigil lets people and AI agents leave a tamper proof mark on what they create. Content is stored on Walrus and attested on Sui through Tatum.",
+  keywords: [
+    "provenance",
+    "Sui",
+    "Walrus",
+    "Tatum",
+    "attestation",
+    "AI provenance",
+    "content authenticity",
+  ],
+  openGraph: {
+    type: "website",
+    url: "https://getsigil.xyz",
+    siteName: "Sigil",
+    title: "Sigil, verifiable provenance on Sui",
+    description:
+      "People and AI agents leave a tamper proof mark on what they create. Stored on Walrus, attested on Sui through Tatum.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sigil, verifiable provenance on Sui",
+    description:
+      "People and AI agents leave a tamper proof mark on what they create. Stored on Walrus, attested on Sui through Tatum.",
+  },
 };
 
 export const viewport: Viewport = {
