@@ -6,6 +6,7 @@ import {
   ConnectButton,
   useCurrentAccount,
   useSignTransaction,
+  useDisconnectWallet,
 } from "@mysten/dapp-kit";
 import {
   UploadSimple,
@@ -13,6 +14,7 @@ import {
   Feather,
   ArrowClockwise,
   Warning,
+  SignOut,
 } from "@phosphor-icons/react";
 import { WaxSeal } from "./wax-seal";
 import { Button, ButtonLink } from "./button";
@@ -37,6 +39,7 @@ const PROV_OPTIONS: ProvenanceType[] = [0, 1, 2];
 export function SignFlow() {
   const account = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
+  const { mutate: disconnect } = useDisconnectWallet();
   const reduce = useReducedMotion();
 
   const [file, setFile] = useState<File | null>(null);
@@ -141,10 +144,21 @@ export function SignFlow() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between rounded-xl border border-hairline bg-surface px-4 py-2.5">
-        <span className="font-mono text-xs text-muted">Connected</span>
-        <span className="font-mono text-xs text-ink">
-          {account.address.slice(0, 6)}...{account.address.slice(-4)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs text-muted">Connected</span>
+          <span className="font-mono text-xs text-ink">
+            {account.address.slice(0, 6)}...{account.address.slice(-4)}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => disconnect()}
+          disabled={busy}
+          className="group flex items-center gap-1.5 font-mono text-xs text-muted transition-colors hover:text-wax disabled:opacity-50"
+        >
+          <SignOut size={14} weight="regular" />
+          Disconnect
+        </button>
       </div>
 
       {/* Dropzone */}
