@@ -15,7 +15,7 @@ import { useEffect, useRef } from "react";
 
 const CELL = 16; // px between glyphs
 const RADIUS = 58; // reveal radius in px
-const MAX_ALPHA = 0.62; // brightest a revealed glyph gets
+const MAX_ALPHA = 0.32; // brightest a revealed glyph gets
 const GLYPHS = "01<>/{}=+*;:#%$".split("");
 
 export function CursorAscii() {
@@ -113,7 +113,7 @@ export function CursorAscii() {
         RADIUS
       );
       // Light mode reads brighter, so keep its glow gentler than dark mode.
-      const haloAlpha = isDark ? 0.09 : 0.04;
+      const haloAlpha = isDark ? 0.06 : 0.025;
       halo.addColorStop(0, withAlpha(isDark ? fg : accent, haloAlpha));
       halo.addColorStop(1, withAlpha(isDark ? fg : accent, 0));
       ctx!.fillStyle = halo;
@@ -124,7 +124,7 @@ export function CursorAscii() {
       // Glyphs, each with a soft halo via shadowBlur for the glow.
       ctx!.fillStyle = fg;
       ctx!.shadowColor = glowColor();
-      const maxAlpha = isDark ? MAX_ALPHA : 0.4;
+      const maxAlpha = isDark ? MAX_ALPHA : 0.2;
       const blurScale = isDark ? 6 : 3;
       const minCol = Math.max(0, Math.floor((pointer.x - RADIUS) / CELL));
       const maxCol = Math.min(cols - 1, Math.ceil((pointer.x + RADIUS) / CELL));
