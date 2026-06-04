@@ -11,6 +11,7 @@ const PROV: Record<string, string> = {
   "2": "AI assisted",
 };
 
+// Cream seal that reads on the wax header band: cream rim and body, wax monogram.
 function sealDataUri(): string {
   const teeth = Array.from({ length: 24 }, (_, i) => {
     const a = (i / 24) * Math.PI * 2;
@@ -19,11 +20,10 @@ function sealDataUri(): string {
     return `<circle cx="${cx}" cy="${cy}" r="3.2"/>`;
   }).join("");
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-    <g fill="#7C2D2D">${teeth}</g>
-    <circle cx="50" cy="50" r="44" fill="#7C2D2D"/>
-    <circle cx="50" cy="50" r="38" fill="#7C2D2D"/>
-    <circle cx="50" cy="50" r="30" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1.5"/>
-    <g fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="#FCFAF4">${teeth}</g>
+    <circle cx="50" cy="50" r="44" fill="#FCFAF4"/>
+    <circle cx="50" cy="50" r="30" fill="none" stroke="#7C2D2D" stroke-opacity="0.35" stroke-width="1.5"/>
+    <g fill="none" stroke="#7C2D2D" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M61 38 C61 31 39 31 39 41 C39 51 61 49 61 59 C61 69 39 69 39 62"/>
       <path d="M50 30 L50 70" stroke-opacity="0.5"/>
     </g>
@@ -63,19 +63,26 @@ export function GET(req: NextRequest) {
           display: "flex",
           flexDirection: "column",
           background: "#F6F2EA",
-          padding: "56px 64px",
           fontFamily: "sans-serif",
         }}
       >
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+        {/* Wax header band */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 26,
+            background: "#7C2D2D",
+            padding: "40px 64px",
+          }}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={sealDataUri()} width={72} height={72} alt="" />
+          <img src={sealDataUri()} width={88} height={88} alt="" />
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 34, fontWeight: 700, color: "#15120E" }}>
+            <div style={{ fontSize: 42, fontWeight: 700, color: "#FCFAF4" }}>
               Sealed on Sigil
             </div>
-            <div style={{ fontSize: 22, color: "#6A6358" }}>
+            <div style={{ fontSize: 24, color: "rgba(252,250,244,0.78)" }}>
               {`${prov}${label ? ` , ${label}` : ""}`}
             </div>
           </div>
@@ -86,7 +93,7 @@ export function GET(req: NextRequest) {
           style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: 44,
+            padding: "40px 64px",
             gap: 18,
           }}
         >
@@ -94,9 +101,10 @@ export function GET(req: NextRequest) {
             <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
               <div
                 style={{
-                  width: 200,
+                  width: 210,
                   fontSize: 20,
-                  color: "#6A6358",
+                  fontWeight: 600,
+                  color: "#7C2D2D",
                   textTransform: "uppercase",
                   letterSpacing: 1,
                 }}
@@ -116,15 +124,17 @@ export function GET(req: NextRequest) {
           ))}
         </div>
 
-        {/* Footer rail */}
+        {/* Wax footer band */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 12,
             marginTop: "auto",
+            background: "#7C2D2D",
+            padding: "20px 64px",
             fontSize: 22,
-            color: "#6A6358",
+            color: "#FCFAF4",
           }}
         >
           <div
@@ -133,7 +143,7 @@ export function GET(req: NextRequest) {
               width: 12,
               height: 12,
               borderRadius: 6,
-              background: "#7C2D2D",
+              background: "#FCFAF4",
             }}
           />
           Stored on Walrus, attested on Sui through Tatum. getsigil.xyz
