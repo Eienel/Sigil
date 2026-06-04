@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { PROVENANCE_LABEL, type ProvenanceType } from "@/lib/sigil";
 import { Button, ButtonLink } from "./button";
+import { CopyButton } from "./copy-button";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
 
@@ -213,23 +214,24 @@ function ResultCard({ result }: { result: Result }) {
       </div>
 
       <dl className="divide-y divide-hairline">
-        <Row label="Signer" value={a.signer} mono />
+        <Row label="Signer" value={a.signer} mono copyValue={a.signer} />
         <Row label="Provenance" value={PROVENANCE_LABEL[a.provenanceType as ProvenanceType] ?? String(a.provenanceType)} />
         <Row label="Time" value={new Date(a.timestampMs).toUTCString()} />
         {a.label && <Row label="Label" value={a.label} />}
-        <Row label="On chain sha256" value={a.sha256Hex} mono />
+        <Row label="On chain sha256" value={a.sha256Hex} mono copyValue={a.sha256Hex} />
         {result.submittedHash && (
-          <Row label="Your file sha256" value={result.submittedHash} mono />
+          <Row label="Your file sha256" value={result.submittedHash} mono copyValue={result.submittedHash} />
         )}
         <Row
           label="Walrus blob"
           value={`${a.walrusBlobId} ${blobAvailable ? "(retrievable)" : "(not retrievable)"}`}
           mono
+          copyValue={a.walrusBlobId}
         />
-        <Row label="Sigil ID" value={a.objectId} mono />
+        <Row label="Sigil ID" value={a.objectId} mono copyValue={a.objectId} />
       </dl>
 
-      <div className="p-4">
+      <div className="space-y-3 p-4">
         <ButtonLink
           href={objUrl}
           external
@@ -240,8 +242,39 @@ function ResultCard({ result }: { result: Result }) {
         >
           View on chain
         </ButtonLink>
+        {authentic && <EmbedBadge objectId={a.objectId} />}
       </div>
     </motion.div>
+  );
+}
+
+function EmbedBadge({ objectId }: { objectId: string }) {
+  const [origin, setOrigin] = useState("https://getsigil.xyz");
+  useEffect(() => {
+    if (typeof window !== "undefined") setOrigin(window.location.origin);
+  }, []);
+
+  const snippet = `<a href="${origin}/verify?id=${objectId}"><img src="${origin}/badge" alt="Verified by Sigil" height="32" /></a>`;
+
+  return (
+    <details className="group rounded-xl border border-hairline bg-paper px-4 py-3">
+      <summary className="flex cursor-pointer items-center justify-between text-sm text-ink">
+        <span className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/badge" alt="Verified by Sigil" height={22} />
+          <span className="text-muted">Embed this badge</span>
+        </span>
+        <span className="font-mono text-xs text-muted transition-transform group-open:rotate-90">
+          ›
+        </span>
+      </summary>
+      <div className="mt-3 flex items-start gap-2">
+        <code className="min-w-0 flex-1 break-all rounded-lg border border-hairline bg-surface px-3 py-2 font-mono text-[11px] text-ink">
+          {snippet}
+        </code>
+        <CopyButton value={snippet} className="mt-2" />
+      </div>
+    </details>
   );
 }
 
@@ -270,18 +303,21 @@ function Row({
   label,
   value,
   mono,
+  copyValue,
 }: {
   label: string;
   value: string;
   mono?: boolean;
+  copyValue?: string;
 }) {
   return (
     <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-3 sm:px-5">
       <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted sm:w-32">
         {label}
       </dt>
-      <dd className={`min-w-0 break-all text-sm text-ink ${mono ? "font-mono" : ""}`}>
-        {value}
+      <dd className={`flex min-w-0 items-start gap-2 text-sm text-ink ${mono ? "font-mono" : ""}`}>
+        <span className="min-w-0 break-all">{value}</span>
+        {copyValue && <CopyButton value={copyValue} className="mt-0.5" />}
       </dd>
     </div>
   );

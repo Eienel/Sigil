@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   ConnectButton,
@@ -15,9 +15,12 @@ import {
   ArrowClockwise,
   Warning,
   SignOut,
+  DownloadSimple,
 } from "@phosphor-icons/react";
+import QRCode from "qrcode";
 import { WaxSeal } from "./wax-seal";
 import { Button, ButtonLink } from "./button";
+import { CopyButton } from "./copy-button";
 import { PROVENANCE_LABEL, type ProvenanceType } from "@/lib/sigil";
 
 const SPRING = { type: "spring" as const, stiffness: 100, damping: 20 };
@@ -290,6 +293,32 @@ function CertificateView({
   const txUrl = `https://suiscan.xyz/${network}/tx/${cert.digest}`;
   const verifyUrl = cert.objectId ? `/verify?id=${cert.objectId}` : "/verify";
 
+  // QR of the absolute verify URL, so anyone can scan the certificate to check
+  // its provenance. Built client side once the cert lands.
+  const [qr, setQr] = useState<string | null>(null);
+  useEffect(() => {
+    if (!cert.objectId || typeof window === "undefined") return;
+    const abs = `${window.location.origin}/verify?id=${cert.objectId}`;
+    QRCode.toDataURL(abs, {
+      margin: 0,
+      width: 240,
+      color: { dark: "#15120e", light: "#00000000" },
+    })
+      .then(setQr)
+      .catch(() => setQr(null));
+  }, [cert.objectId]);
+
+  // Download the certificate as a PNG generated server side.
+  const downloadHref = `/api/cert-image?${new URLSearchParams({
+    file: cert.fileName,
+    sha256: cert.sha256,
+    blob: cert.blobId,
+    object: cert.objectId ?? "",
+    digest: cert.digest,
+    prov: String(cert.provenanceType),
+    label: cert.label,
+  }).toString()}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -319,6 +348,16 @@ function CertificateView({
           {PROVENANCE_LABEL[cert.provenanceType]}
           {cert.label ? ` , ${cert.label}` : ""}
         </p>
+
+        {qr && (
+          <div className="mt-5 flex flex-col items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qr} alt="Scan to verify" width={96} height={96} />
+            <span className="mt-2 font-mono text-[11px] uppercase tracking-wide text-muted">
+              Scan to verify
+            </span>
+          </div>
+        )}
       </div>
 
       <dl className="divide-y divide-hairline">
@@ -345,6 +384,14 @@ function CertificateView({
         >
           View transaction
         </ButtonLink>
+        <a
+          href={downloadHref}
+          download={`sigil-${(cert.objectId ?? cert.digest).slice(0, 10)}.png`}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium text-muted transition-colors hover:text-ink"
+        >
+          <DownloadSimple size={15} weight="regular" />
+          Download
+        </a>
         <Button type="button" onClick={onReset} variant="ghost">
           <ArrowClockwise size={15} weight="regular" />
           Sign another
@@ -368,8 +415,9 @@ function CertRow({
       <dt className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted sm:w-24">
         {label}
       </dt>
-      <dd className={`min-w-0 break-all text-sm text-ink ${mono ? "font-mono" : ""}`}>
-        {value}
+      <dd className={`flex min-w-0 items-start gap-2 text-sm text-ink ${mono ? "font-mono" : ""}`}>
+        <span className="min-w-0 break-all">{value}</span>
+        {mono && <CopyButton value={value} className="mt-0.5" />}
       </dd>
     </div>
   );
