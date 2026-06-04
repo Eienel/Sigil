@@ -61,92 +61,138 @@ export function GET(req: NextRequest) {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          background: "#F6F2EA",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          background: "linear-gradient(135deg, #4A1A1A 0%, #1A0E0C 100%)",
           fontFamily: "sans-serif",
         }}
       >
-        {/* Wax header band */}
+        {/* Soft glow orbs for depth */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 26,
-            background: "#7C2D2D",
-            padding: "40px 64px",
+            position: "absolute",
+            top: -160,
+            right: -120,
+            width: 520,
+            height: 520,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(162,58,58,0.55) 0%, rgba(162,58,58,0) 70%)",
           }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={sealDataUri()} width={88} height={88} alt="" />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 42, fontWeight: 700, color: "#FCFAF4" }}>
-              Sealed on Sigil
-            </div>
-            <div style={{ fontSize: 24, color: "rgba(252,250,244,0.78)" }}>
-              {`${prov}${label ? ` , ${label}` : ""}`}
-            </div>
-          </div>
-        </div>
+        />
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            bottom: -180,
+            left: -140,
+            width: 480,
+            height: 480,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(124,45,45,0.45) 0%, rgba(124,45,45,0) 70%)",
+          }}
+        />
 
-        {/* Rows */}
+        {/* Frosted glass card */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            padding: "40px 64px",
-            gap: 18,
+            width: 1040,
+            padding: "48px 56px",
+            borderRadius: 32,
+            background: "rgba(252,250,244,0.06)",
+            border: "1px solid rgba(252,250,244,0.16)",
+            boxShadow: "0 24px 70px rgba(0,0,0,0.40)",
           }}
         >
-          {rows.map(([k, v]) => (
-            <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
-              <div
-                style={{
-                  width: 210,
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: "#7C2D2D",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                {k}
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={sealDataUri()} width={84} height={84} alt="" />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 40, fontWeight: 700, color: "#FCFAF4" }}>
+                Sealed on Sigil
               </div>
-              <div
-                style={{
-                  fontSize: 26,
-                  color: "#15120E",
-                  fontFamily: "monospace",
-                }}
-              >
-                {v}
+              <div style={{ fontSize: 23, color: "rgba(252,250,244,0.72)" }}>
+                {`${prov}${label ? ` , ${label}` : ""}`}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Wax footer band */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            marginTop: "auto",
-            background: "#7C2D2D",
-            padding: "20px 64px",
-            fontSize: 22,
-            color: "#FCFAF4",
-          }}
-        >
+          {/* Divider */}
           <div
             style={{
               display: "flex",
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              background: "#FCFAF4",
+              height: 1,
+              background: "rgba(252,250,244,0.14)",
+              margin: "30px 0",
             }}
           />
-          Stored on Walrus, attested on Sui through Tatum. getsigil.xyz
+
+          {/* Rows */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {rows.map(([k, v]) => (
+              <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
+                <div
+                  style={{
+                    width: 200,
+                    fontSize: 18,
+                    fontWeight: 600,
+                    color: "rgba(252,250,244,0.55)",
+                    textTransform: "uppercase",
+                    letterSpacing: 1.5,
+                  }}
+                >
+                  {k}
+                </div>
+                <div
+                  style={{
+                    fontSize: 26,
+                    color: "#FCFAF4",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {v}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              display: "flex",
+              height: 1,
+              background: "rgba(252,250,244,0.14)",
+              margin: "30px 0 24px",
+            }}
+          />
+
+          {/* Footer rail */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              fontSize: 20,
+              color: "rgba(252,250,244,0.6)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                width: 11,
+                height: 11,
+                borderRadius: 6,
+                background: "#A23A3A",
+              }}
+            />
+            Stored on Walrus, attested on Sui through Tatum. getsigil.xyz
+          </div>
         </div>
       </div>
     ),
